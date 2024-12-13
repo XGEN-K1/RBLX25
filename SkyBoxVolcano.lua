@@ -1,0 +1,12 @@
+s = Instance.new("Sky")
+s.Name = "HellVulcanic"
+--s.MoonTextureid = "rbxasset://sky/moon.jpg"
+s.SkyboxBk = "http://www.roblox.com/asset/?id=6941350785"
+s.SkyboxDn = "rbxassetid://6941274037"
+s.SkyboxFt = "rbxassetid://6941273775"
+s.SkyboxLf = "rbxassetid://6941274136"
+s.SkyboxRt = "rbxassetid://6941273946"
+s.SkyboxUp = "rbxassetid://6941273677"
+--s.SunTextureid = "rbxasset://sky/sun.jpg"
+game.Lighting.TimeOfDay = 6
+s.Parent = game.Lighting

@@ -1,0 +1,9 @@
+local Pmaterial = Enum.Material.ForceField 
+				local Pcolor = Color3.fromRGB(0,0,0)
+				local NewPartU = Instance.new("Part")
+				NewPartU.Position = game.Players.LocalPlayer.Character.HumanoidRootPart.Position - Vector3.new(0, 4, 0) --Position of the part
+				NewPartU.Size = Vector3.new(200000,0.1,200000) 
+				NewPartU.Color = Pcolor
+				NewPartU.LocalTransparencyModifier = 0.3
+				NewPartU.Anchored = true
+				NewPartU.Parent = workspace 

@@ -1,0 +1,12 @@
+s = Instance.new("Sky")
+s.Name = "Hell1"
+--s.MoonTextureid = "rbxasset://sky/moon.jpg"
+s.SkyboxBk = "rbxassetid://6938549166"
+s.SkyboxDn = "rbxassetid://6938548985"
+s.SkyboxFt = "rbxassetid://6938549755"
+s.SkyboxLf = "rbxassetid://6938549557"
+s.SkyboxRt = "rbxassetid://6938548487"
+s.SkyboxUp = "rbxassetid://6938548227"
+--s.SunTextureid = "rbxasset://sky/sun.jpg"
+game.Lighting.TimeOfDay = 6
+s.Parent = game.Lighting

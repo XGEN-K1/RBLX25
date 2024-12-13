@@ -1,0 +1,12 @@
+s = Instance.new("Sky")
+s.Name = "Sky1"
+--s.MoonTextureid = "rbxasset://sky/moon.jpg"
+s.SkyboxBk = "http://www.roblox.com/asset/?id=169210090"
+s.SkyboxDn = "http://www.roblox.com/asset/?id=169210108"
+s.SkyboxFt = "http://www.roblox.com/asset/?id=169210121"
+s.SkyboxLf = "http://www.roblox.com/asset/?id=169210133"
+s.SkyboxRt = "http://www.roblox.com/asset/?id=169210143"
+s.SkyboxUp = "http://www.roblox.com/asset/?id=169210149"
+--s.SunTextureid = "rbxasset://sky/sun.jpg"
+game.Lighting.TimeOfDay = 6
+s.Parent = game.Lighting

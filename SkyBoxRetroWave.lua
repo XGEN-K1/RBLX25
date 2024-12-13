@@ -1,0 +1,12 @@
+s = Instance.new("Sky")
+s.Name = "retrowave"
+--s.MoonTextureid = "rbxasset://sky/moon.jpg"
+s.SkyboxBk = "rbxassetid://8631780182"
+s.SkyboxDn = "rbxassetid://8631784904"
+s.SkyboxFt = "rbxassetid://8631769834"
+s.SkyboxLf = "rbxassetid://8631777199"
+s.SkyboxRt = "rbxassetid://8631735555"
+s.SkyboxUp = "rbxassetid://8631782345"
+--s.SunTextureid = "rbxasset://sky/sun.jpg"
+game.Lighting.TimeOfDay = 6
+s.Parent = game.Lighting
