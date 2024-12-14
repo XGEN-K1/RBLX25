@@ -290,23 +290,7 @@ NewScrollFrame.BackgroundTransparency = 0.9
 NewScrollFrame.BorderSizePixel = 0
 NewScrollFrame.ScrollBarImageColor3 = Color3.fromRGB(169, 169, 169)
 
--- [ New Button (t1) inside NewScrollFrame ]
-local t1Button = Instance.new("TextButton")
-t1Button.Name = "t1Button"
-t1Button.Parent = NewScrollFrame
-t1Button.Size = UDim2.new(0, 150, 0, 50)
-t1Button.Position = UDim2.new(0, 10, 0, 10)
-t1Button.BackgroundColor3 = Color3.fromRGB(169, 169, 169)
-t1Button.BackgroundTransparency = 0.9
-t1Button.Text = "t1 Button"
-t1Button.Font = Enum.Font.SourceSans
-t1Button.TextSize = 24
-t1Button.TextColor3 = Color3.fromRGB(255, 255, 255)
-t1Button.BorderSizePixel = 0
 
-t1Button.MouseButton1Click:Connect(function()
-    print("t1 button clicked!")
-end)
 
 -- [ CloseTargetGUIButton Properties ]
 CloseTargetGUIButton.Name = "CloseTargetGUIButton"
@@ -362,6 +346,107 @@ TargetGUIFrame.InputEnded:Connect(function(input)
 end)
 
 
+
+--loadstring(game:HttpGet("https://raw.githubusercontent.com/XGEN-K1/RBLX25/refs/heads/main/SearchTargetModule.lua"))()
+
+-- Створення GUI для пошуку та відображення аватара цілі
+local TargetTextBox = Instance.new("TextBox")
+local AvatarImageLabel = Instance.new("ImageLabel")
+local UsernameLabel = Instance.new("TextLabel")
+local DisplaynameLabel = Instance.new("TextLabel")
+
+-- Налаштування TargetTextBox
+TargetTextBox.Name = "TargetInputBox"
+TargetTextBox.Parent = NewScrollFrame
+TargetTextBox.Size = UDim2.new(0, 345, 0, 30)
+TargetTextBox.Position = UDim2.new(0, 10, 0, 5) -- Розташування у NewScrollFrame
+TargetTextBox.PlaceholderText = "Enter player name"
+TargetTextBox.Text = ""
+TargetTextBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+TargetTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+TargetTextBox.Font = Enum.Font.SourceSans
+TargetTextBox.TextSize = 18
+
+-- Налаштування AvatarImageLabel
+AvatarImageLabel.Name = "TargetAvatarImage"
+AvatarImageLabel.Parent = NewScrollFrame
+AvatarImageLabel.Size = UDim2.new(0, 100, 0, 100)
+AvatarImageLabel.Position = UDim2.new(0, 10, 0, 45) -- Розташування під TargetTextBox
+AvatarImageLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+AvatarImageLabel.BackgroundTransparency = 1
+AvatarImageLabel.Image = ""
+
+-- Налаштування UsernameLabel
+UsernameLabel.Name = "UsernameLabel"
+UsernameLabel.Parent = NewScrollFrame
+UsernameLabel.Size = UDim2.new(0, 200, 0, 30)
+UsernameLabel.Position = UDim2.new(0, 120, 0, 45) -- Розташування справа від AvatarImageLabel
+UsernameLabel.BackgroundTransparency = 1
+UsernameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+UsernameLabel.Font = Enum.Font.SourceSans
+UsernameLabel.TextSize = 18
+UsernameLabel.Text = "Username:"
+
+-- Налаштування DisplaynameLabel
+DisplaynameLabel.Name = "DisplaynameLabel"
+DisplaynameLabel.Parent = NewScrollFrame
+DisplaynameLabel.Size = UDim2.new(0, 200, 0, 30)
+DisplaynameLabel.Position = UDim2.new(0, 120, 0, 80) -- Розташування під UsernameLabel
+DisplaynameLabel.BackgroundTransparency = 1
+DisplaynameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+DisplaynameLabel.Font = Enum.Font.SourceSans
+DisplaynameLabel.TextSize = 18
+DisplaynameLabel.Text = "Displayname:"
+
+-- Функція пошуку гравця та оновлення аватара та інформації
+local function updateAvatar()
+    local playerName = TargetTextBox.Text
+    if playerName == "" then
+        AvatarImageLabel.Image = ""
+        UsernameLabel.Text = "Username:"
+        DisplaynameLabel.Text = "Displayname:"
+        return
+    end
+
+    local targetPlayer = nil
+
+    -- Спочатку шукаємо за username
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if string.find(string.lower(player.Name), string.lower(playerName)) then
+            targetPlayer = player
+            break
+        end
+    end
+
+    -- Якщо не знайдено, шукаємо за displayname
+    if not targetPlayer then
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if string.find(string.lower(player.DisplayName), string.lower(playerName)) then
+                targetPlayer = player
+                break
+            end
+        end
+    end
+
+    -- Оновлюємо аватар та інформацію або очищуємо
+    if targetPlayer then
+        local userId = targetPlayer.UserId
+        AvatarImageLabel.Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. userId .. "&width=150&height=150&format=png"
+        UsernameLabel.Text = "Username: " .. targetPlayer.Name
+        DisplaynameLabel.Text = "Displayname: " .. targetPlayer.DisplayName
+    else
+        AvatarImageLabel.Image = ""
+        UsernameLabel.Text = "Username:"
+        DisplaynameLabel.Text = "Displayname:"
+    end
+end
+
+-- Виконувати пошук при зміні тексту в TargetTextBox
+TargetTextBox:GetPropertyChangedSignal("Text"):Connect(updateAvatar)
+
+
+
+--кінець
 -- [ ToggleMenu Function to Handle Minimize and Alt + B ]
 local menuIsVisible = true
 
