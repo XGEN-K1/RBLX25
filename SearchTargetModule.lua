@@ -1,22 +1,22 @@
 -- Створення GUI для пошуку та відображення аватара цілі
 local ScreenGui = Instance.new("ScreenGui")
-local TargetFrame = Instance.new("Frame")
+--local TargetFrame = Instance.new("Frame")
 local TargetTextBox = Instance.new("TextBox")
 local AvatarImageLabel = Instance.new("ImageLabel")
 
 -- Налаштування GUI
 ScreenGui.Name = "TargetGui"
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-
+--[[
 TargetFrame.Name = "TargetMainFrame"
 TargetFrame.Parent = ScreenGui
 TargetFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 TargetFrame.Size = UDim2.new(0, 300, 0, 200)
 TargetFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
 TargetFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-
+]]
 TargetTextBox.Name = "TargetInputBox"
-TargetTextBox.Parent = TargetFrame
+TargetTextBox.Parent = NewScrollFrame
 TargetTextBox.Size = UDim2.new(0, 200, 0, 30)
 TargetTextBox.Position = UDim2.new(0.5, -100, 0, 20)
 TargetTextBox.PlaceholderText = "Enter player name"

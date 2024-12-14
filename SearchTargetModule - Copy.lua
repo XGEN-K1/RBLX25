@@ -1,43 +1,43 @@
 -- Створення GUI для пошуку та відображення аватара цілі
 local ScreenGui = Instance.new("ScreenGui")
-local Frame = Instance.new("Frame")
-local TextBox = Instance.new("TextBox")
-local ImageLabel = Instance.new("ImageLabel")
+local TargetFrame = Instance.new("Frame")
+local TargetTextBox = Instance.new("TextBox")
+local AvatarImageLabel = Instance.new("ImageLabel")
 
 -- Налаштування GUI
 ScreenGui.Name = "TargetGui"
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
-Frame.Name = "MainFrame"
-Frame.Parent = ScreenGui
-Frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-Frame.Size = UDim2.new(0, 300, 0, 200)
-Frame.Position = UDim2.new(0.5, -150, 0.5, -100)
-Frame.AnchorPoint = Vector2.new(0.5, 0.5)
+TargetFrame.Name = "TargetMainFrame"
+TargetFrame.Parent = ScreenGui
+TargetFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+TargetFrame.Size = UDim2.new(0, 300, 0, 200)
+TargetFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
+TargetFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 
-TextBox.Name = "InputBox"
-TextBox.Parent = Frame
-TextBox.Size = UDim2.new(0, 200, 0, 30)
-TextBox.Position = UDim2.new(0.5, -100, 0, 20)
-TextBox.PlaceholderText = "Enter player name"
-TextBox.Text = ""
-TextBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-TextBox.Font = Enum.Font.SourceSans
-TextBox.TextSize = 18
+TargetTextBox.Name = "TargetInputBox"
+TargetTextBox.Parent = TargetFrame
+TargetTextBox.Size = UDim2.new(0, 200, 0, 30)
+TargetTextBox.Position = UDim2.new(0.5, -100, 0, 20)
+TargetTextBox.PlaceholderText = "Enter player name"
+TargetTextBox.Text = ""
+TargetTextBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+TargetTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+TargetTextBox.Font = Enum.Font.SourceSans
+TargetTextBox.TextSize = 18
 
-ImageLabel.Name = "AvatarImage"
-ImageLabel.Parent = Frame
-ImageLabel.Size = UDim2.new(0, 100, 0, 100)
-ImageLabel.Position = UDim2.new(0.5, -50, 0, 70)
-ImageLabel.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-ImageLabel.Image = ""
+AvatarImageLabel.Name = "TargetAvatarImage"
+AvatarImageLabel.Parent = TargetFrame
+AvatarImageLabel.Size = UDim2.new(0, 100, 0, 100)
+AvatarImageLabel.Position = UDim2.new(0.5, -50, 0, 70)
+AvatarImageLabel.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+AvatarImageLabel.Image = ""
 
 -- Функція пошуку гравця та оновлення аватара
 local function updateAvatar()
-    local playerName = TextBox.Text
+    local playerName = TargetTextBox.Text
     if playerName == "" then
-        ImageLabel.Image = ""
+        AvatarImageLabel.Image = ""
         return
     end
 
@@ -64,11 +64,11 @@ local function updateAvatar()
     -- Оновлюємо аватар або очищуємо
     if targetPlayer then
         local userId = targetPlayer.UserId
-        ImageLabel.Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. userId .. "&width=150&height=150&format=png"
+        AvatarImageLabel.Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. userId .. "&width=150&height=150&format=png"
     else
-        ImageLabel.Image = ""
+        AvatarImageLabel.Image = ""
     end
 end
 
--- Виконувати пошук при зміні тексту в TextBox
-TextBox:GetPropertyChangedSignal("Text"):Connect(updateAvatar)
+-- Виконувати пошук при зміні тексту в TargetTextBox
+TargetTextBox:GetPropertyChangedSignal("Text"):Connect(updateAvatar)
