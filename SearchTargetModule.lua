@@ -27,7 +27,7 @@ TargetTextBox.Font = Enum.Font.SourceSans
 TargetTextBox.TextSize = 18
 
 AvatarImageLabel.Name = "TargetAvatarImage"
-AvatarImageLabel.Parent = TargetFrame
+AvatarImageLabel.Parent = NewScrollFrame
 AvatarImageLabel.Size = UDim2.new(0, 100, 0, 100)
 AvatarImageLabel.Position = UDim2.new(0.5, -50, 0, 70)
 AvatarImageLabel.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
