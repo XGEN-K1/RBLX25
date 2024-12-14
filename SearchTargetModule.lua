@@ -1,24 +1,12 @@
 -- Створення GUI для пошуку та відображення аватара цілі
-local ScreenGui = Instance.new("ScreenGui")
---local TargetFrame = Instance.new("Frame")
 local TargetTextBox = Instance.new("TextBox")
 local AvatarImageLabel = Instance.new("ImageLabel")
 
--- Налаштування GUI
-ScreenGui.Name = "TargetGui"
-ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
---[[
-TargetFrame.Name = "TargetMainFrame"
-TargetFrame.Parent = ScreenGui
-TargetFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-TargetFrame.Size = UDim2.new(0, 300, 0, 200)
-TargetFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
-TargetFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-]]
+-- Налаштування TargetTextBox
 TargetTextBox.Name = "TargetInputBox"
 TargetTextBox.Parent = NewScrollFrame
 TargetTextBox.Size = UDim2.new(0, 200, 0, 30)
-TargetTextBox.Position = UDim2.new(0.5, -100, 0, 20)
+TargetTextBox.Position = UDim2.new(0, 10, 0, 70) -- Розташування у NewScrollFrame
 TargetTextBox.PlaceholderText = "Enter player name"
 TargetTextBox.Text = ""
 TargetTextBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
@@ -26,10 +14,11 @@ TargetTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 TargetTextBox.Font = Enum.Font.SourceSans
 TargetTextBox.TextSize = 18
 
+-- Налаштування AvatarImageLabel
 AvatarImageLabel.Name = "TargetAvatarImage"
 AvatarImageLabel.Parent = NewScrollFrame
 AvatarImageLabel.Size = UDim2.new(0, 100, 0, 100)
-AvatarImageLabel.Position = UDim2.new(0.5, -50, 0, 70)
+AvatarImageLabel.Position = UDim2.new(0, 10, 0, 110) -- Розташування під TargetTextBox
 AvatarImageLabel.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
 AvatarImageLabel.Image = ""
 
