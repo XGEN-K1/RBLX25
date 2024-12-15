@@ -367,6 +367,7 @@ TargetTextBox.Position = UDim2.new(0, 10, 0, 5) -- Розташування у N
 TargetTextBox.PlaceholderText = "Enter player name"
 TargetTextBox.Text = ""
 TargetTextBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+TargetTextBox.BackgroundTransparency = 0.7
 TargetTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 TargetTextBox.Font = Enum.Font.SourceSans
 TargetTextBox.TextSize = 18
@@ -695,7 +696,249 @@ FlingButton.MouseButton1Click:Connect(function()
 end)
 
 
+-- [ GotoButton Properties ]
+local GotoButton = Instance.new("TextButton")
 
+GotoButton.Name = "GotoButton"
+GotoButton.Parent = NewScrollFrame
+GotoButton.Size = UDim2.new(0, 115, 0, 35)
+GotoButton.Position = UDim2.new(0, 120, 0, 150)
+GotoButton.BackgroundColor3 = Color3.fromRGB(169, 169, 169)
+GotoButton.BackgroundTransparency = 0.9
+GotoButton.Text = "Goto"
+GotoButton.Font = Enum.Font.SourceSans
+GotoButton.TextSize = 16
+GotoButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+GotoButton.BorderSizePixel = 0
+
+
+
+GotoButton.MouseButton1Click:Connect(function()
+    -- Check if a target player is selected
+    if not targetPlayer or not targetPlayer.Character or not LocalPlayer.Character then
+        print("No valid target player selected or target player does not have a character.")
+        return
+    end
+
+    -- Get the position of the target player's character
+    local targetCharacter = targetPlayer.Character
+    local targetPosition = targetCharacter:FindFirstChild("HumanoidRootPart")
+
+    -- Get the local player's character
+    local localCharacter = LocalPlayer.Character
+    local localHumanoidRootPart = localCharacter:FindFirstChild("HumanoidRootPart")
+
+    if targetPosition and localHumanoidRootPart then
+        -- Teleport the local player to the target player's position
+        localHumanoidRootPart.CFrame = targetPosition.CFrame
+        print("Teleported to " .. targetPlayer.Name)
+    else
+        print("Teleportation failed. Make sure both characters have HumanoidRootParts.")
+    end
+end)
+
+
+-- [ AimButton Properties ]
+local AimButton = Instance.new("TextButton")
+
+AimButton.Name = "AimButton"
+AimButton.Parent = NewScrollFrame
+AimButton.Size = UDim2.new(0, 115, 0, 35)
+AimButton.Position = UDim2.new(0, 240, 0, 150)
+AimButton.BackgroundColor3 = Color3.fromRGB(169, 169, 169)
+AimButton.BackgroundTransparency = 0.9
+AimButton.Text = "Aim(weird)"
+AimButton.Font = Enum.Font.SourceSans
+AimButton.TextSize = 16
+AimButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+AimButton.BorderSizePixel = 0
+
+
+
+local currentlyAimingAt = nil -- Змінна для збереження поточного об'єкта цілі
+local aimingConnection = nil -- Для збереження циклу Aim
+
+AimButton.MouseButton1Click:Connect(function()
+    if not targetPlayer then
+        -- Якщо ціль не вибрана, показати повідомлення
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "[ Fail To Aim ]";
+            Text = "Target not selected or invalid.";
+            Duration = 5;
+        })
+        return
+    end
+
+    if currentlyAimingAt == targetPlayer then
+        -- Вимикаємо Aim, якщо ціль вже активна
+        currentlyAimingAt = nil
+        AimButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Сірий
+        AimButton.Text = "Aim (Off)"
+
+        -- Зупиняємо цикл Aim
+        if aimingConnection then
+            aimingConnection:Disconnect()
+            aimingConnection = nil
+        end
+
+        print("Aim disabled for:", targetPlayer.Name)
+    else
+        -- Перемикаємося на нову ціль
+        currentlyAimingAt = targetPlayer
+        AimButton.TextColor3 = Color3.fromRGB(0, 255, 0) -- Зелений
+        AimButton.Text = "Aim (On)"
+
+        -- Якщо вже був активний Aim, спочатку відключаємо його
+        if aimingConnection then
+            aimingConnection:Disconnect()
+        end
+
+        -- Активуємо Aim для нової цілі
+        aimingConnection = game:GetService("RunService").Stepped:Connect(function()
+            if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("Head") then
+                local headPosition = targetPlayer.Character.Head.Position
+                local camera = workspace.CurrentCamera
+                camera.CFrame = CFrame.new(camera.CFrame.Position, headPosition)
+            end
+        end)
+
+        print("Now aiming at:", targetPlayer.Name)
+    end
+end)
+
+
+
+
+-- [ EspButton Properties ]
+local EspButton = Instance.new("TextButton")
+
+EspButton.Name = "EspButton"
+EspButton.Parent = NewScrollFrame
+EspButton.Size = UDim2.new(0, 115, 0, 35)
+EspButton.Position = UDim2.new(0, 0, 0, 150)
+EspButton.BackgroundColor3 = Color3.fromRGB(169, 169, 169)
+EspButton.BackgroundTransparency = 0.9
+EspButton.Text = "Esp(weird)"
+EspButton.Font = Enum.Font.SourceSans
+EspButton.TextSize = 16
+EspButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+EspButton.BorderSizePixel = 0
+
+
+
+
+local currentlyLocatedPlayer = nil -- Гравець, який зараз відстежується
+local locateLoop = nil -- Для збереження циклу оновлення
+
+EspButton.MouseButton1Click:Connect(function()
+    if not targetPlayer then
+        -- Якщо targetPlayer не вибраний, показати повідомлення
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "[ Fail To Locate ]";
+            Text = "No target player selected.";
+            Duration = 10;
+        })
+        return
+    end
+
+    if currentlyLocatedPlayer == targetPlayer then
+        -- Якщо вже відстежується цей гравець, вимикаємо відстеження
+        currentlyLocatedPlayer = nil
+        EspButton.Text = "ESP (Off)"
+        EspButton.TextColor3 = Color3.fromRGB(255, 0, 0)
+
+        -- Зупиняємо цикл оновлення
+        if locateLoop then
+            locateLoop:Disconnect()
+            locateLoop = nil
+        end
+
+        -- Видаляємо всі елементи GUI для відстеження
+        for _, descendant in pairs(game.Workspace:GetDescendants()) do
+            if descendant.Name == "Red_BloxZBoard" then
+                descendant:Destroy()
+            end
+        end
+
+        print("ESP disabled.")
+    else
+        -- Увімкнення ESP для нового гравця
+        currentlyLocatedPlayer = targetPlayer
+        EspButton.Text = "ESP (On)"
+        EspButton.TextColor3 = Color3.fromRGB(0, 255, 0)
+
+        -- Створюємо GUI для відображення цілі
+        local Folder = Instance.new("Folder")
+        Folder.Name = "Red_BloxZBoard"
+        Folder.Parent = game.Workspace
+
+        local BillboardGui = Instance.new("BillboardGui")
+        local TextLabel = Instance.new("TextLabel")
+
+        BillboardGui.Adornee = targetPlayer.Character:FindFirstChild("Head")
+        BillboardGui.Name = "B"
+        BillboardGui.Parent = Folder
+        BillboardGui.Size = UDim2.new(0, 100, 0, 150)
+        BillboardGui.StudsOffset = Vector3.new(0, 1, 0)
+        BillboardGui.AlwaysOnTop = true
+
+        TextLabel.Name = "BillRedZ"
+        TextLabel.Parent = BillboardGui
+        TextLabel.BackgroundTransparency = 1
+        TextLabel.Position = UDim2.new(0, 0, 0, -50)
+        TextLabel.Size = UDim2.new(0, 100, 0, 100)
+        TextLabel.Font = Enum.Font.SourceSansSemibold
+        TextLabel.TextSize = 20
+        TextLabel.TextColor3 = Color3.new(1, 1, 1)
+        TextLabel.TextStrokeTransparency = 0
+        TextLabel.TextYAlignment = Enum.TextYAlignment.Bottom
+        TextLabel.Text = 'Name: ' .. targetPlayer.Name .. ' | Health: ' .. math.floor(targetPlayer.Character:FindFirstChild("Humanoid").Health)
+        TextLabel.ZIndex = 10
+
+        for _, part in pairs(targetPlayer.Character:GetChildren()) do
+            if part:IsA("BasePart") then
+                local box = Instance.new("BoxHandleAdornment")
+                box.Name = part.Name
+                box.Parent = Folder
+                box.Adornee = part
+                box.AlwaysOnTop = true
+                box.ZIndex = 10
+                box.Size = part.Size
+                box.Transparency = 0.3
+                box.Color = targetPlayer.TeamColor
+            end
+        end
+
+        -- Цикл оновлення інформації про ціль
+        locateLoop = game:GetService("RunService").Stepped:Connect(function()
+            if currentlyLocatedPlayer and currentlyLocatedPlayer.Character and currentlyLocatedPlayer.Character:FindFirstChild("Humanoid") then
+                local health = math.floor(currentlyLocatedPlayer.Character.Humanoid.Health)
+                for _, label in pairs(game.Workspace:GetDescendants()) do
+                    if label.Name == "BillRedZ" then
+                        label.Text = 'Name: ' .. currentlyLocatedPlayer.Name .. ' | Health: ' .. health
+                    end
+                end
+            else
+                -- Якщо ціль недоступна, вимикаємо ESP
+                EspButton.Text = "ESP (Off)"
+                EspButton.TextColor3 = Color3.fromRGB(255, 0, 0)
+                currentlyLocatedPlayer = nil
+                if locateLoop then
+                    locateLoop:Disconnect()
+                    locateLoop = nil
+                end
+                for _, descendant in pairs(game.Workspace:GetDescendants()) do
+                    if descendant.Name == "Red_BloxZBoard" then
+                        descendant:Destroy()
+                    end
+                end
+                print("Target lost. ESP disabled.")
+            end
+        end)
+
+        print("ESP enabled for:", targetPlayer.Name)
+    end
+end)
 
 
 

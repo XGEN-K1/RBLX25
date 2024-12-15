@@ -367,6 +367,7 @@ TargetTextBox.Position = UDim2.new(0, 10, 0, 5) -- Розташування у N
 TargetTextBox.PlaceholderText = "Enter player name"
 TargetTextBox.Text = ""
 TargetTextBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+TargetTextBox.BackgroundTransparency = 0.7
 TargetTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 TargetTextBox.Font = Enum.Font.SourceSans
 TargetTextBox.TextSize = 18
@@ -691,9 +692,71 @@ FlingButton.BorderSizePixel = 0
 
 
 FlingButton.MouseButton1Click:Connect(function()
-    SkidFling(targetPlaye)
+    SkidFling(targetPlayer)
 end)
 
+
+-- [ GotoButton Properties ]
+local GotoButton = Instance.new("TextButton")
+
+GotoButton.Name = "GotoButton"
+GotoButton.Parent = NewScrollFrame
+GotoButton.Size = UDim2.new(0, 115, 0, 35)
+GotoButton.Position = UDim2.new(0, 120, 0, 150)
+GotoButton.BackgroundColor3 = Color3.fromRGB(169, 169, 169)
+GotoButton.BackgroundTransparency = 0.9
+GotoButton.Text = "Goto"
+GotoButton.Font = Enum.Font.SourceSans
+GotoButton.TextSize = 16
+GotoButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+GotoButton.BorderSizePixel = 0
+
+
+
+GotoButton.MouseButton1Click:Connect(function()
+    -- Check if a target player is selected
+    if not targetPlayer or not targetPlayer.Character or not LocalPlayer.Character then
+        print("No valid target player selected or target player does not have a character.")
+        return
+    end
+
+    -- Get the position of the target player's character
+    local targetCharacter = targetPlayer.Character
+    local targetPosition = targetCharacter:FindFirstChild("HumanoidRootPart")
+
+    -- Get the local player's character
+    local localCharacter = LocalPlayer.Character
+    local localHumanoidRootPart = localCharacter:FindFirstChild("HumanoidRootPart")
+
+    if targetPosition and localHumanoidRootPart then
+        -- Teleport the local player to the target player's position
+        localHumanoidRootPart.CFrame = targetPosition.CFrame
+        print("Teleported to " .. targetPlayer.Name)
+    else
+        print("Teleportation failed. Make sure both characters have HumanoidRootParts.")
+    end
+end)
+
+
+-- [ AimButton Properties ]
+local AimButton = Instance.new("TextButton")
+
+AimButton.Name = "AimButton"
+AimButton.Parent = NewScrollFrame
+AimButton.Size = UDim2.new(0, 115, 0, 35)
+AimButton.Position = UDim2.new(0, 240, 0, 150)
+AimButton.BackgroundColor3 = Color3.fromRGB(169, 169, 169)
+AimButton.BackgroundTransparency = 0.9
+AimButton.Text = "Aim"
+AimButton.Font = Enum.Font.SourceSans
+AimButton.TextSize = 16
+AimButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+AimButton.BorderSizePixel = 0
+
+
+AimButton.MouseButton1Click:Connect(function()
+    SkidAim(targetPlayer)
+end)
 
 
 
