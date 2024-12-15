@@ -17,6 +17,10 @@ local TestSettingsButton = Instance.new("TextButton")
 local TestTargetGUIButton = Instance.new("TextButton")
 
 
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+
 -- [ ScreenGui Properties ]
 TGui.Name = "TGui"
 TGui.Parent = game.CoreGui
@@ -290,23 +294,7 @@ NewScrollFrame.BackgroundTransparency = 0.9
 NewScrollFrame.BorderSizePixel = 0
 NewScrollFrame.ScrollBarImageColor3 = Color3.fromRGB(169, 169, 169)
 
--- [ New Button (t1) inside NewScrollFrame ]
-local t1Button = Instance.new("TextButton")
-t1Button.Name = "t1Button"
-t1Button.Parent = NewScrollFrame
-t1Button.Size = UDim2.new(0, 150, 0, 50)
-t1Button.Position = UDim2.new(0, 10, 0, 10)
-t1Button.BackgroundColor3 = Color3.fromRGB(169, 169, 169)
-t1Button.BackgroundTransparency = 0.9
-t1Button.Text = "t1 Button"
-t1Button.Font = Enum.Font.SourceSans
-t1Button.TextSize = 24
-t1Button.TextColor3 = Color3.fromRGB(255, 255, 255)
-t1Button.BorderSizePixel = 0
 
-t1Button.MouseButton1Click:Connect(function()
-    print("t1 button clicked!")
-end)
 
 -- [ CloseTargetGUIButton Properties ]
 CloseTargetGUIButton.Name = "CloseTargetGUIButton"
@@ -362,6 +350,357 @@ TargetGUIFrame.InputEnded:Connect(function(input)
 end)
 
 
+
+--loadstring(game:HttpGet("https://raw.githubusercontent.com/XGEN-K1/RBLX25/refs/heads/main/SearchTargetModule.lua"))()
+
+-- Створення GUI для пошуку та відображення аватара цілі
+local TargetTextBox = Instance.new("TextBox")
+local AvatarImageLabel = Instance.new("ImageLabel")
+local UsernameLabel = Instance.new("TextLabel")
+local DisplaynameLabel = Instance.new("TextLabel")
+
+-- Налаштування TargetTextBox
+TargetTextBox.Name = "TargetInputBox"
+TargetTextBox.Parent = NewScrollFrame
+TargetTextBox.Size = UDim2.new(0, 345, 0, 30)
+TargetTextBox.Position = UDim2.new(0, 10, 0, 5) -- Розташування у NewScrollFrame
+TargetTextBox.PlaceholderText = "Enter player name"
+TargetTextBox.Text = ""
+TargetTextBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+TargetTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+TargetTextBox.Font = Enum.Font.SourceSans
+TargetTextBox.TextSize = 18
+
+-- Налаштування AvatarImageLabel
+AvatarImageLabel.Name = "TargetAvatarImage"
+AvatarImageLabel.Parent = NewScrollFrame
+AvatarImageLabel.Size = UDim2.new(0, 100, 0, 100)
+AvatarImageLabel.Position = UDim2.new(0, 10, 0, 45) -- Розташування під TargetTextBox
+AvatarImageLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+AvatarImageLabel.BackgroundTransparency = 1
+AvatarImageLabel.Image = ""
+
+-- Налаштування UsernameLabel
+UsernameLabel.Name = "UsernameLabel"
+UsernameLabel.Parent = NewScrollFrame
+UsernameLabel.Size = UDim2.new(0, 200, 0, 30)
+UsernameLabel.Position = UDim2.new(0, 120, 0, 45) -- Розташування справа від AvatarImageLabel
+UsernameLabel.BackgroundTransparency = 1
+UsernameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+UsernameLabel.Font = Enum.Font.SourceSans
+UsernameLabel.TextSize = 18
+UsernameLabel.Text = "Username:"
+
+-- Налаштування DisplaynameLabel
+DisplaynameLabel.Name = "DisplaynameLabel"
+DisplaynameLabel.Parent = NewScrollFrame
+DisplaynameLabel.Size = UDim2.new(0, 200, 0, 30)
+DisplaynameLabel.Position = UDim2.new(0, 120, 0, 80) -- Розташування під UsernameLabel
+DisplaynameLabel.BackgroundTransparency = 1
+DisplaynameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+DisplaynameLabel.Font = Enum.Font.SourceSans
+DisplaynameLabel.TextSize = 18
+DisplaynameLabel.Text = "Displayname:"
+
+-- Функція пошуку гравця та оновлення аватара та інформації
+local targetPlayer = nil -- Гравець, за яким будемо спостерігати
+
+local function updateAvatar()
+    local playerName = TargetTextBox.Text
+    if playerName == "" then
+        targetPlayer = nil
+        AvatarImageLabel.Image = ""
+        UsernameLabel.Text = "Username:"
+        DisplaynameLabel.Text = "Displayname:"
+        return
+    end
+
+    targetPlayer = nil -- Скидаємо попереднє значення
+
+    -- Спочатку шукаємо за username
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if string.find(string.lower(player.Name), string.lower(playerName)) then
+            targetPlayer = player
+            break
+        end
+    end
+
+    -- Якщо не знайдено, шукаємо за displayname
+    if not targetPlayer then
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if string.find(string.lower(player.DisplayName), string.lower(playerName)) then
+                targetPlayer = player
+                break
+            end
+        end
+    end
+
+    -- Оновлюємо аватар та інформацію або очищуємо
+    if targetPlayer then
+        local userId = targetPlayer.UserId
+        AvatarImageLabel.Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. userId .. "&width=150&height=150&format=png"
+        UsernameLabel.Text = "Username: " .. targetPlayer.Name
+        DisplaynameLabel.Text = "Displayname: " .. targetPlayer.DisplayName
+    else
+        AvatarImageLabel.Image = ""
+        UsernameLabel.Text = "Username:"
+        DisplaynameLabel.Text = "Displayname:"
+    end
+end
+
+
+-- Виконувати пошук при зміні тексту в TargetTextBox
+TargetTextBox:GetPropertyChangedSignal("Text"):Connect(updateAvatar)
+
+
+--
+
+-- [ SpectateButton Properties ]
+local SpectateButton = Instance.new("TextButton")
+
+SpectateButton.Name = "SpectateButton"
+SpectateButton.Parent = NewScrollFrame
+SpectateButton.Size = UDim2.new(0, 115, 0, 35)
+SpectateButton.Position = UDim2.new(0, 120, 0, 110)
+SpectateButton.BackgroundColor3 = Color3.fromRGB(169, 169, 169)
+SpectateButton.BackgroundTransparency = 0.9
+SpectateButton.Text = "Spectate"
+SpectateButton.Font = Enum.Font.SourceSans
+SpectateButton.TextSize = 16
+SpectateButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpectateButton.BorderSizePixel = 0
+
+local currentlySpectating = nil -- Гравець, за яким ведеться спостереження
+
+SpectateButton.MouseButton1Click:Connect(function()
+    -- Якщо гравець не вибраний, просто повертаємо
+    if not targetPlayer then
+        print("Гравець не вибраний для спостереження")
+        return
+    end
+
+    -- Перевіряємо, чи вже стежимо за цим гравцем
+    if currentlySpectating == targetPlayer then
+        -- Вимикаємо стеження
+        currentlySpectating = nil
+		
+        -- Повертаємо камеру до локального гравця або до самого об'єкта LocalPlayer
+        if LocalPlayer.Character then
+            workspace.CurrentCamera.CameraSubject = LocalPlayer.Character
+        else
+            workspace.CurrentCamera.CameraSubject = LocalPlayer
+        end
+
+        SpectateButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Змінюємо колір тексту на сірий
+        print("Слідкування вимкнено. Камера повернена до локального гравця.")
+    else
+        -- Починаємо стеження за обраним гравцем
+        currentlySpectating = targetPlayer
+
+        -- Перевіряємо, чи `targetPlayer.Character` доступний
+        if targetPlayer.Character then
+            workspace.CurrentCamera.CameraSubject = targetPlayer.Character -- Перемикаємо камеру на обраного гравця
+            SpectateButton.TextColor3 = Color3.fromRGB(0, 255, 0) -- Змінюємо колір тексту на зелений
+            print("Тепер спостерігаєте за:", targetPlayer.Name)
+        else
+            print("Персонаж гравця недоступний для спостереження")
+            currentlySpectating = nil -- Скидаємо статус стеження
+        end
+    end
+end)
+
+--fling
+
+local SkidFling = function(TargetPlayer)
+
+   local Character = LocalPlayer.Character
+   local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+   local RootPart = Humanoid and Humanoid.RootPart
+
+   local TCharacter = TargetPlayer.Character
+   local THumanoid
+   local TRootPart
+   local THead
+   local Accessory
+   local Handle
+
+   if TCharacter:FindFirstChildOfClass("Humanoid") then
+       THumanoid = TCharacter:FindFirstChildOfClass("Humanoid")
+   end
+   if THumanoid and THumanoid.RootPart then
+       TRootPart = THumanoid.RootPart
+   end
+   if TCharacter:FindFirstChild("Head") then
+       THead = TCharacter.Head
+   end
+   if TCharacter:FindFirstChildOfClass("Accessory") then
+       Accessory = TCharacter:FindFirstChildOfClass("Accessory")
+   end
+   if Accessoy and Accessory:FindFirstChild("Handle") then
+       Handle = Accessory.Handle
+   end
+
+   if Character and Humanoid and RootPart then
+       if RootPart.Velocity.Magnitude < 50 then
+           getgenv().OldPos = RootPart.CFrame
+       end
+       if THumanoid and THumanoid.Sit and not AllBool then
+       end
+       if THead then
+           workspace.CurrentCamera.CameraSubject = THead
+       elseif not THead and Handle then
+           workspace.CurrentCamera.CameraSubject = Handle
+       elseif THumanoid and TRootPart then
+           workspace.CurrentCamera.CameraSubject = THumanoid
+       end
+       if not TCharacter:FindFirstChildWhichIsA("BasePart") then
+           return
+       end
+       
+       local FPos = function(BasePart, Pos, Ang)
+           RootPart.CFrame = CFrame.new(BasePart.Position) * Pos * Ang
+           Character:SetPrimaryPartCFrame(CFrame.new(BasePart.Position) * Pos * Ang)
+           RootPart.Velocity = Vector3.new(9e7, 9e7 * 10, 9e7)
+           RootPart.RotVelocity = Vector3.new(9e8, 9e8, 9e8)
+       end
+       
+       local SFBasePart = function(BasePart)
+           local TimeToWait = 2
+           local Time = tick()
+           local Angle = 0
+
+           repeat
+               if RootPart and THumanoid then
+                   if BasePart.Velocity.Magnitude < 50 then
+                       Angle = Angle + 100
+
+                       FPos(BasePart, CFrame.new(0, 1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle),0 ,0))
+                       task.wait()
+
+                       FPos(BasePart, CFrame.new(0, -1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                       task.wait()
+
+                       FPos(BasePart, CFrame.new(2.25, 1.5, -2.25) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                       task.wait()
+
+                       FPos(BasePart, CFrame.new(-2.25, -1.5, 2.25) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                       task.wait()
+
+                       FPos(BasePart, CFrame.new(0, 1.5, 0) + THumanoid.MoveDirection,CFrame.Angles(math.rad(Angle), 0, 0))
+                       task.wait()
+
+                       FPos(BasePart, CFrame.new(0, -1.5, 0) + THumanoid.MoveDirection,CFrame.Angles(math.rad(Angle), 0, 0))
+                       task.wait()
+                   else
+                       FPos(BasePart, CFrame.new(0, 1.5, THumanoid.WalkSpeed), CFrame.Angles(math.rad(90), 0, 0))
+                       task.wait()
+
+                       FPos(BasePart, CFrame.new(0, -1.5, -THumanoid.WalkSpeed), CFrame.Angles(0, 0, 0))
+                       task.wait()
+
+                       FPos(BasePart, CFrame.new(0, 1.5, THumanoid.WalkSpeed), CFrame.Angles(math.rad(90), 0, 0))
+                       task.wait()
+                       
+                       FPos(BasePart, CFrame.new(0, 1.5, TRootPart.Velocity.Magnitude / 1.25), CFrame.Angles(math.rad(90), 0, 0))
+                       task.wait()
+
+                       FPos(BasePart, CFrame.new(0, -1.5, -TRootPart.Velocity.Magnitude / 1.25), CFrame.Angles(0, 0, 0))
+                       task.wait()
+
+                       FPos(BasePart, CFrame.new(0, 1.5, TRootPart.Velocity.Magnitude / 1.25), CFrame.Angles(math.rad(90), 0, 0))
+                       task.wait()
+
+                       FPos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(math.rad(90), 0, 0))
+                       task.wait()
+
+                       FPos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(0, 0, 0))
+                       task.wait()
+
+                       FPos(BasePart, CFrame.new(0, -1.5 ,0), CFrame.Angles(math.rad(-90), 0, 0))
+                       task.wait()
+
+                       FPos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(0, 0, 0))
+                       task.wait()
+                   end
+               else
+                   break
+               end
+           until BasePart.Velocity.Magnitude > 500 or BasePart.Parent ~= TargetPlayer.Character or TargetPlayer.Parent ~= Players or not TargetPlayer.Character == TCharacter or THumanoid.Sit or Humanoid.Health <= 0 or tick() > Time + TimeToWait
+       end
+       
+       workspace.FallenPartsDestroyHeight = 0/0
+       
+       local BV = Instance.new("BodyVelocity")
+       BV.Name = "EpixVel"
+       BV.Parent = RootPart
+       BV.Velocity = Vector3.new(9e8, 9e8, 9e8)
+       BV.MaxForce = Vector3.new(1/0, 1/0, 1/0)
+       
+       Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+       
+       if TRootPart and THead then
+           if (TRootPart.CFrame.p - THead.CFrame.p).Magnitude > 5 then
+               SFBasePart(THead)
+           else
+               SFBasePart(TRootPart)
+           end
+       elseif TRootPart and not THead then
+           SFBasePart(TRootPart)
+       elseif not TRootPart and THead then
+           SFBasePart(THead)
+       elseif not TRootPart and not THead and Accessory and Handle then
+           SFBasePart(Handle)
+       else
+       end
+       
+       BV:Destroy()
+       Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+       workspace.CurrentCamera.CameraSubject = Humanoid
+       
+       repeat
+           RootPart.CFrame = getgenv().OldPos * CFrame.new(0, .5, 0)
+           Character:SetPrimaryPartCFrame(getgenv().OldPos * CFrame.new(0, .5, 0))
+           Humanoid:ChangeState("GettingUp")
+           table.foreach(Character:GetChildren(), function(_, x)
+               if x:IsA("BasePart") then
+                   x.Velocity, x.RotVelocity = Vector3.new(), Vector3.new()
+               end
+           end)
+           task.wait()
+       until (RootPart.Position - getgenv().OldPos.p).Magnitude < 25
+       workspace.FallenPartsDestroyHeight = getgenv().FPDH
+   else
+   end
+end
+
+
+-- [ FlingButton Properties ]
+local FlingButton = Instance.new("TextButton")
+
+FlingButton.Name = "FlingButton"
+FlingButton.Parent = NewScrollFrame
+FlingButton.Size = UDim2.new(0, 115, 0, 35)
+FlingButton.Position = UDim2.new(0, 240, 0, 110)
+FlingButton.BackgroundColor3 = Color3.fromRGB(169, 169, 169)
+FlingButton.BackgroundTransparency = 0.9
+FlingButton.Text = "Fling"
+FlingButton.Font = Enum.Font.SourceSans
+FlingButton.TextSize = 16
+FlingButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+FlingButton.BorderSizePixel = 0
+
+
+FlingButton.MouseButton1Click:Connect(function()
+    SkidFling(targetPlaye)
+end)
+
+
+
+
+
+
+
+--кінець
 -- [ ToggleMenu Function to Handle Minimize and Alt + B ]
 local menuIsVisible = true
 
