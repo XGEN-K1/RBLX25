@@ -1,0 +1,174 @@
+-- Отримуємо необхідні сервіси
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+-- Локальний гравець
+local player = Players.LocalPlayer
+
+-- Функція для телепортації
+local function teleportToCoords(x, y, z)
+    if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
+        warn("Персонаж не знайдений")
+        return
+    end
+
+    local character = player.Character
+    local vehicleSeat = nil
+
+    for _, part in pairs(workspace:GetDescendants()) do
+        if part:IsA("VehicleSeat") and part.Occupant == character.Humanoid then
+            vehicleSeat = part
+            break
+        end
+    end
+
+    if vehicleSeat then
+        local carModel = vehicleSeat:FindFirstAncestorOfClass("Model")
+        if carModel then
+            carModel:SetPrimaryPartCFrame(CFrame.new(Vector3.new(x, y, z)))
+            print("Телепортовано до координат:", x, y, z)
+        else
+            warn("Модель машини не знайдена")
+        end
+    else
+        warn("Транспортний засіб не знайдено")
+    end
+end
+
+-- Створюємо ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player:WaitForChild("PlayerGui")
+screenGui.Name = "TeleportGui"
+
+-- Створюємо головний фрейм
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 300, 0, 400)
+mainFrame.Position = UDim2.new(0.5, -150, 0.5, -200)
+mainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
+mainFrame.Active = true
+
+-- Додаємо прокручування
+local scrollFrame = Instance.new("ScrollingFrame")
+scrollFrame.Size = UDim2.new(1, 0, 1, -30)
+scrollFrame.Position = UDim2.new(0, 0, 0, 30)
+scrollFrame.CanvasSize = UDim2.new(0, 0, 2, 0)
+scrollFrame.ScrollBarThickness = 8
+scrollFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+scrollFrame.Parent = mainFrame
+
+-- Додаємо заголовок
+local title = Instance.new("TextLabel")
+title.Text = "TpGui"
+title.Size = UDim2.new(1, -30, 0, 30)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextSize = 18
+title.Font = Enum.Font.SourceSansBold
+title.Parent = mainFrame
+
+-- Кнопка закриття
+local closeButton = Instance.new("TextButton")
+closeButton.Text = "X"
+closeButton.Size = UDim2.new(0, 30, 0, 30)
+closeButton.Position = UDim2.new(1, -30, 0, 0)
+closeButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.TextSize = 18
+closeButton.Font = Enum.Font.SourceSansBold
+closeButton.Parent = mainFrame
+
+closeButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+end)
+
+-- Масив для кнопок і полів вводу
+local locations = {
+    {name = "NewBay", coords = Vector3.new(450, 101, -178)},
+    {name = "CrystalCave", coords = Vector3.new(-7262, -632, 952)},
+    {name = "Custom1", coords = Vector3.new(0, 0, 0)},
+    {name = "Custom2", coords = Vector3.new(0, 0, 0)},
+    {name = "Custom3", coords = Vector3.new(0, 0, 0)},
+    {name = "Custom4", coords = Vector3.new(0, 0, 0)},
+    {name = "Custom5", coords = Vector3.new(0, 0, 0)}
+}
+
+-- Додавання кнопок і полів вводу
+for i, location in ipairs(locations) do
+    local button = Instance.new("TextButton")
+    button.Text = location.name
+    button.Size = UDim2.new(0.4, -5, 0, 30)
+    button.Position = UDim2.new(0, 5, 0, (i - 1) * 35)
+    button.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.TextSize = 14
+    button.Font = Enum.Font.SourceSans
+    button.Parent = scrollFrame
+
+    local input = Instance.new("TextBox")
+    input.Text = tostring(location.coords.X) .. ", " .. tostring(location.coords.Y) .. ", " .. tostring(location.coords.Z)
+    input.Size = UDim2.new(0.6, -10, 0, 30)
+    input.Position = UDim2.new(0.4, 10, 0, (i - 1) * 35)
+    input.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    input.TextColor3 = Color3.fromRGB(255, 255, 255)
+    input.TextSize = 14
+    input.Font = Enum.Font.SourceSans
+    input.ClearTextOnFocus = false
+    input.Parent = scrollFrame
+
+    button.MouseButton1Click:Connect(function()
+        local coords = string.split(input.Text, ",")
+        if #coords == 3 then
+            local x = tonumber(coords[1])
+            local y = tonumber(coords[2])
+            local z = tonumber(coords[3])
+            if x and y and z then
+                teleportToCoords(x, y, z)
+            else
+                warn("Некоректні координати")
+            end
+        else
+            warn("Некоректний формат вводу координат")
+        end
+    end)
+end
+
+-- Робимо GUI перетягуваним
+local dragging
+local dragInput
+local dragStart
+local startPos
+
+local function update(input)
+    local delta = input.Position - dragStart
+    mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+mainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+mainFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
+end)

@@ -1,0 +1,83 @@
+-- Скрипт для Roblox
+
+local tool = Instance.new("Tool")
+tool.Name = "StructureViewer"
+tool.RequiresHandle = false
+tool.Parent = game.Players.LocalPlayer.Backpack
+
+local gui = Instance.new("ScreenGui")
+gui.Parent = game.Players.LocalPlayer.PlayerGui
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 400, 0, 300)
+frame.Position = UDim2.new(0, 10, 0, 10)
+frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+frame.Parent = gui
+
+local textLabel = Instance.new("TextLabel")
+textLabel.Size = UDim2.new(1, 0, 1, 0)
+textLabel.Text = "Click on a part to view its hierarchy."
+textLabel.TextSize = 16
+textLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+textLabel.TextWrapped = true
+textLabel.BackgroundTransparency = 1
+textLabel.Parent = frame
+
+-- Функція для перетягування GUI
+local dragging = false
+local dragInput, dragStart, startPos
+
+local function updateDrag(input)
+	local delta = input.Position - dragStart
+	frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+frame.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = frame.Position
+		input.Changed:Connect(function()
+			if dragging == false then
+				updateDrag(input)
+			end
+		end)
+	end
+end)
+
+frame.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = false
+	end
+end)
+
+-- Функція для відображення ієрархії
+local function displayHierarchy(part)
+	local hierarchy = {}
+	local current = part
+	while current.Parent do
+		table.insert(hierarchy, 1, current.Name)
+		current = current.Parent
+	end
+	return table.concat(hierarchy, " -> ")
+end
+
+-- Функція для натискання на об'єкти
+tool.Activated:Connect(function()
+	local mouse = game.Players.LocalPlayer:GetMouse()
+	local target = mouse.Target
+	if target and target:IsA("BasePart") then
+		local hierarchy = displayHierarchy(target)
+		local parent = target.Parent
+		local siblings = {}
+		for _, child in ipairs(parent:GetChildren()) do
+			if child ~= target then
+				table.insert(siblings, child.Name)
+			end
+		end
+
+		-- Формування тексту для відображення
+		local siblingsText = table.concat(siblings, ", ")
+		textLabel.Text = "Path: " .. hierarchy .. "\n\nParent: " .. parent.Name .. "\n\nSiblings: " .. siblingsText
+	end
+end)

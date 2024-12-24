@@ -1,0 +1,42 @@
+-- Задайте координати для телепортації
+local targetPosition = Vector3.new(504, 69, -107) -- Змініть ці координати на потрібні
+
+-- Отримуємо гравця
+local player = game.Players.LocalPlayer
+
+-- Функція для телепортації машини разом із гравцем
+local function teleportCar()
+    -- Перевіряємо, чи є у гравця персонаж
+    if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
+        warn("Персонаж не знайдений")
+        return
+    end
+    
+    -- Знаходимо транспортний засіб
+    local character = player.Character
+    local vehicleSeat = nil
+    
+    -- Пошук VehicleSeat, на якому сидить гравець
+    for _, part in pairs(workspace:GetDescendants()) do
+        if part:IsA("VehicleSeat") and part.Occupant == character.Humanoid then
+            vehicleSeat = part
+            break
+        end
+    end
+    
+    if vehicleSeat then
+        -- Телепортуємо машину разом із гравцем
+        local carModel = vehicleSeat:FindFirstAncestorOfClass("Model")
+        if carModel then
+            carModel:SetPrimaryPartCFrame(CFrame.new(targetPosition))
+            print("Машина телепортована!")
+        else
+            warn("Модель машини не знайдена")
+        end
+    else
+        warn("Транспортний засіб не знайдено")
+    end
+end
+
+-- Виклик функції телепортації (можете прив'язати до кнопки або іншої події)
+teleportCar()

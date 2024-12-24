@@ -1,0 +1,21 @@
+furniture -611, 89, 274
+zik -462, 73, 712 
+sellery 1442, 22, 174
+UGS 1902, 19, -209
+VI logic -5141, 82, -2796
+Lab interance -4478, 163, -1912
+inside vilab -4406, -185, -2028
+crystal cave -7255, -623, 945
+cardealership -6904, 13, -4302
+sarcophag -7881, 27, -3239
+newbay 522, 98, -84
+base 522, 98, -84
+
+
+wixard 2023, -423, -282
+lushshop 2267, -465, -22
+
+elfinAdam -7579, 720, -3647
+natyricfinds 2197, 19, -742
+
+si

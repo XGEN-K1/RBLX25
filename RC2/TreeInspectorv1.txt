@@ -1,0 +1,76 @@
+-- Створюємо Tool
+local tool = Instance.new("Tool")
+tool.Name = "TreeInspector"
+tool.RequiresHandle = false
+tool.Parent = game.Players.LocalPlayer:WaitForChild("Backpack")
+
+-- Створюємо ScreenGUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "TreeInspectorGui"
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Створюємо Frame для GUI
+local frame = Instance.new("Frame")
+frame.Name = "MainFrame"
+frame.Size = UDim2.new(0, 200, 0, 150) -- Збільшений розмір
+frame.Position = UDim2.new(0.5, -200, 0.1, 0)
+frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+frame.BackgroundTransparency = 0.9
+frame.Draggable = true
+frame.Active = true
+frame.Parent = screenGui
+
+-- Створюємо TextLabel для відображення інформації
+local textLabel = Instance.new("TextLabel")
+textLabel.Name = "TreeInfoLabel"
+textLabel.Size = UDim2.new(1, 0, 1, 0)
+textLabel.BackgroundTransparency = 1
+textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+textLabel.TextScaled = true
+textLabel.TextWrapped = true
+textLabel.Text = "Натисніть на дерево, щоб отримати інформацію"
+textLabel.Parent = frame
+
+-- Функція для отримання предків типу Model
+local function getModelAncestors(part)
+    local details = ""
+
+    -- Перевіряємо предків, додаємо лише ті, що типу Model
+    local current = part.Parent
+    details = details .. "TreeInspector:\n"
+    while current do
+        if current:IsA("Model") then
+            details = details .. "- " .. current.Name .. "\n"
+        end
+        current = current.Parent
+    end
+
+    -- Якщо предків типу Model не знайдено
+    if details == "Предки (Model):\n" then
+        details = "Предки (Model): Не знайдено"
+    end
+
+    return details
+end
+
+-- Скрипт для інструмента
+tool.Activated:Connect(function()
+    local mouse = game.Players.LocalPlayer:GetMouse()
+
+    mouse.Button1Down:Connect(function()
+        local target = mouse.Target
+        if target then
+            -- Отримуємо предків типу Model
+            local details = getModelAncestors(target)
+
+            -- Виводимо інформацію в GUI
+            textLabel.Text = details
+
+            -- Виводимо інформацію в консоль
+            print(details)
+        else
+            textLabel.Text = "Немає частини"
+            print("Немає частини")
+        end
+    end)
+end)

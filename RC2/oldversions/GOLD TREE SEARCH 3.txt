@@ -1,0 +1,90 @@
+-- Скрипт для пошуку об'єктів, фарбування та створення інтерфейсу
+
+-- Функція для пошуку та фарбування об'єктів
+local function colorParts()
+    local count = 0
+    local trees = workspace.WorldSpawn.Trees:GetChildren()
+    for _, tree in pairs(trees) do
+        if tree:IsA("Model") and tree.Name == "Goldwood Tree" then
+            local hittableParts = tree:FindFirstChild("Hittable")
+            if hittableParts then
+                for _, part in pairs(hittableParts:GetChildren()) do
+                    if part:IsA("Part") and (part.BrickColor ~= BrickColor.new("Bright yellow") or part.Material ~= Enum.Material.Neon) then
+                        part.BrickColor = BrickColor.new("Bright yellow")
+                        part.Material = Enum.Material.Neon
+                        count = count + 1
+                    end
+                end
+            end
+        end
+    end
+    print("Кількість пофарбованих об'єктів: " .. count)
+end
+
+-- Створення інтерфейсу
+
+-- Створення основного фрейму
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.Players.LocalPlayer.PlayerGui
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 200, 0, 150)
+frame.Position = UDim2.new(0.5, -100, 0.5, -75)
+frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+frame.BorderSizePixel = 2
+frame.Parent = screenGui
+
+-- Додавання можливості перетягування з обмеженням частоти оновлення
+local dragging = false
+local dragInput, dragStart, startPos
+
+local function update(input)
+    local delta = input.Position - dragStart
+    frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+    end
+end)
+
+frame.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        update(input)
+    end
+end)
+
+frame.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+-- Створення кнопки для активації фарбування
+local colorButton = Instance.new("TextButton")
+colorButton.Size = UDim2.new(0, 180, 0, 40)
+colorButton.Position = UDim2.new(0, 10, 0, 10)
+colorButton.Text = "Пофарбувати дерева"
+colorButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+colorButton.BackgroundColor3 = Color3.fromRGB(100, 100, 255)
+colorButton.Parent = frame
+
+colorButton.MouseButton1Click:Connect(function()
+    colorParts()  -- Викликаємо функцію фарбування
+end)
+
+-- Створення кнопки для закриття меню
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 180, 0, 40)
+closeButton.Position = UDim2.new(0, 10, 0, 60)
+closeButton.Text = "Закрити меню"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+closeButton.Parent = frame
+
+closeButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy()  -- Закриваємо меню
+end)
