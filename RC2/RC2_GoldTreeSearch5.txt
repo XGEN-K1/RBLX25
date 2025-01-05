@@ -1,0 +1,117 @@
+if game.PlaceId ~= 12196278347 then
+    warn("Цей скрипт можна використовувати лише в грі з ID 12196278347.")
+    return
+end
+
+local RunService = game:GetService("RunService")
+
+-- Функція для пошуку та фарбування об'єктів
+local function colorParts()
+    local count = 0
+    local trees = workspace.WorldSpawn.Trees:GetChildren()
+
+    for _, tree in ipairs(trees) do
+        if tree:IsA("Model") and tree.Name == "Goldwood Tree" then
+            local hittableParts = tree:FindFirstChild("Hittable")
+            if hittableParts then
+                for _, part in ipairs(hittableParts:GetChildren()) do
+                    if part:IsA("Part") and (part.BrickColor ~= BrickColor.new("Bright yellow") or part.Material ~= Enum.Material.Neon) then
+                        part.BrickColor = BrickColor.new("Bright yellow")
+                        part.Material = Enum.Material.Neon
+                        count += 1
+                    end
+                end
+            end
+        end
+    end
+
+    print("Кількість пофарбованих об'єктів: " .. count)
+end
+
+-- Створення інтерфейсу
+
+-- Створення основного фрейму
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 70, 0, 50)
+
+frame.Position = UDim2.new(0, 300, 0, 970)
+
+frame.BorderSizePixel = 2
+frame.Parent = screenGui
+	frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	frame.BackgroundTransparency = 0.9
+
+
+-- Додавання можливості перетягування з оптимізацією
+local dragging = false
+local dragInput, dragStart, startPos
+
+frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+frame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+    if dragging and dragInput then
+        local delta = dragInput.Position - dragStart
+        frame.Position = UDim2.new(
+            startPos.X.Scale, startPos.X.Offset + delta.X,
+            startPos.Y.Scale, startPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+-- Створення кнопки для активації фарбування
+local debounce = false
+
+local colorButton = Instance.new("TextButton")
+colorButton.Size = UDim2.new(0, 45, 0, 20)
+colorButton.Position = UDim2.new(0, 1, 0, 1)
+colorButton.Text = "Paint"
+colorButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+colorButton.BackgroundColor3 = Color3.fromRGB(100, 100, 255)
+colorButton.Parent = frame
+	--colorButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	colorButton.BackgroundTransparency = 0.5
+	colorButton.TextColor3 = Color3.new(255, 255, 255)
+
+colorButton.MouseButton1Click:Connect(function()
+    if not debounce then
+        debounce = true
+        colorParts() -- Викликаємо функцію фарбування
+        debounce = false
+    end
+end)
+
+-- Створення кнопки для закриття меню
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 20, 0, 20)
+closeButton.Position = UDim2.new(0, 49, 0, 1)
+closeButton.Text = "X"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+	--colorButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	closeButton.BackgroundTransparency = 0.5
+	closeButton.TextColor3 = Color3.new(255, 255, 255)
+closeButton.Parent = frame
+
+closeButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy() -- Закриваємо меню
+end)
