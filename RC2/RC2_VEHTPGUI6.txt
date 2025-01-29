@@ -28,6 +28,7 @@ local teleportPoints = {
     {"BlueRoom", Vector3.new(326, 23, 634)},
     {"Ship1", Vector3.new(-356, 21, 1326)},
     {"Ship2", Vector3.new(-3801, 40, -852)},
+    {"SecretCola", Vector3.new(10004, -491, 5030)},
     {"MyBase", Vector3.new(522, 98, -84)},
     {"Friend1", Vector3.new(522, 98, -84)},
     {"Plot1", Vector3.new(1711, 33, -250)},

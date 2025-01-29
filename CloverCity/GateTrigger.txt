@@ -1,0 +1,16 @@
+local LocalPlayer_upvr = game.Players.LocalPlayer
+local KeyPad_upvr = game.Workspace.LabGate.KeyPad
+local SurfaceGui = KeyPad_upvr.SurfaceGui
+local Code_upvr = KeyPad_upvr.Code
+local ClearCD_upvr = KeyPad_upvr.ClearCD
+local LabKeyPad_upvr = game.ReplicatedStorage:WaitForChild("RemoteEvents").LabKeyPad
+local LabClear_upvr = game.ReplicatedStorage:WaitForChild("RemoteEvents").LabClear
+local LabEnter_upvr = game.ReplicatedStorage:WaitForChild("RemoteEvents").LabEnter
+
+LabClear_upvr:FireServer()
+LabKeyPad_upvr:FireServer(workspace.LabGate.KeyPad.SurfaceGui.NumberPad["1"].Name)
+LabKeyPad_upvr:FireServer(workspace.LabGate.KeyPad.SurfaceGui.NumberPad["3"].Name)
+LabKeyPad_upvr:FireServer(workspace.LabGate.KeyPad.SurfaceGui.NumberPad["3"].Name)
+LabKeyPad_upvr:FireServer(workspace.LabGate.KeyPad.SurfaceGui.NumberPad["7"].Name)
+LabEnter_upvr:FireServer()
+

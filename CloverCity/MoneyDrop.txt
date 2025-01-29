@@ -1,0 +1,15 @@
+local playerName = "Vinchezo6" -- Можеш змінювати тут ім'я гравця
+local DropEvent_upvr = workspace:FindFirstChild(playerName) and workspace[playerName]:FindFirstChild("Wallet") and workspace[playerName].Wallet:FindFirstChild("DropEvent")
+
+if not DropEvent_upvr then
+    local player = game:GetService("Players"):FindFirstChild(playerName)
+    if player then
+        DropEvent_upvr = player.Backpack:FindFirstChild("Wallet") and player.Backpack.Wallet:FindFirstChild("DropEvent")
+    end
+end
+
+if DropEvent_upvr then
+    DropEvent_upvr:FireServer("1")
+else
+    warn("DropEvent не знайдено!")
+end

@@ -1,0 +1,40 @@
+local playerNameToTeleport = "" -- Залиште порожнім для локального гравця або вкажіть ім'я іншого гравця
+local parentFolder = workspace.Grab
+local targetPosition = Vector3.new(1438, 26, 182) -- Точки, куди телепортуємо
+local teleportDelay = 0 -- Затримка 3 секунди
+
+-- Список ключових слів для пошуку в назвах моделей
+local searchKeywords = {"Wood", "Fish"}
+
+-- Функція для перевірки чи містить назва елемента одне з ключових слів
+local function matchesSearchKeywords(name)
+    for _, keyword in ipairs(searchKeywords) do
+        if string.find(name, keyword) then
+            return true
+        end
+    end
+    return false
+end
+
+local function teleportObjects()
+    -- Якщо поле для імені порожнє, використовуємо локального гравця
+    local playerName = playerNameToTeleport == "" and game.Players.LocalPlayer.Name or playerNameToTeleport
+    
+    for _, child in ipairs(parentFolder:GetChildren()) do
+        if child:IsA("Model") and matchesSearchKeywords(child.Name) and child:FindFirstChild("Owner") then
+            local ownerValue = tostring(child.Owner.Value)
+            if ownerValue == playerName then
+                local primaryPart = child.PrimaryPart or child:FindFirstChildWhichIsA("BasePart")
+                if primaryPart and not primaryPart.Anchored then
+                    -- Телепортуємо об'єкт на задані координати
+                    child:SetPrimaryPartCFrame(CFrame.new(targetPosition))
+                end
+            end
+        end
+    end
+end
+
+-- Затримка перед телепортацією та запуск
+wait(teleportDelay)
+teleportObjects()
+print("Телепортація завершена.")

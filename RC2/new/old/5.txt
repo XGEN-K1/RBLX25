@@ -1,0 +1,90 @@
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local playerPositionPart = character:WaitForChild("HumanoidRootPart")
+
+local parentFolder = workspace.Grab
+local playerName = player.Name
+
+local runService = game:GetService("RunService")
+local userInputService = game:GetService("UserInputService")
+
+local offset = Vector3.new(0, 20, 0) -- Офсет на 20 одиниць вище
+local isActive = false -- Стан активації
+local teleporting = false -- Статус телепортування
+local connection -- Для управління циклом
+
+local function teleportObjects()
+    for _, child in ipairs(parentFolder:GetChildren()) do
+        if child:IsA("Model") and string.find(child.Name, "Wood") and child:FindFirstChild("Owner") then
+            local ownerValue = tostring(child.Owner.Value)
+            if ownerValue == playerName then
+                local primaryPart = child.PrimaryPart or child:FindFirstChildWhichIsA("BasePart")
+                if primaryPart and not primaryPart.Anchored then
+                    -- Тимчасово зупиняємо фізику об'єкта
+                    primaryPart.AssemblyLinearVelocity = Vector3.zero
+                    primaryPart.AssemblyAngularVelocity = Vector3.zero
+                    primaryPart:ApplyImpulse(Vector3.zero)
+
+                    -- Задаємо офсет і телепортуємо об'єкт
+                    local targetPosition = playerPositionPart.Position + offset
+                    child:SetPrimaryPartCFrame(CFrame.new(targetPosition))
+
+                    -- Відновлюємо фізику після телепортації
+                    wait(0.1) -- Дочекаємося стабілізації об'єкта
+                end
+            end
+        end
+    end
+end
+
+local function startTeleport()
+    if teleporting then return end
+    teleporting = true
+
+    -- Запуск циклу телепортації
+    connection = runService.Heartbeat:Connect(function()
+        if not isActive then
+            if connection then
+                connection:Disconnect()
+            end
+            teleporting = false
+            print("Телепортація зупинена.")
+        else
+            teleportObjects()
+        end
+    end)
+end
+
+local function toggleScript()
+    isActive = not isActive
+    print(isActive and "Скрипт активовано." or "Скрипт деактивовано.")
+    if isActive then
+        startTeleport()
+    elseif connection then
+        connection:Disconnect()
+        teleporting = false
+        print("Телепортація зупинена.")
+    end
+end
+
+local function handleKeyPress(input, gameProcessed)
+    if gameProcessed then return end
+
+    -- Активувати/дезактивувати скрипт
+    if input.KeyCode == Enum.KeyCode.J then
+        toggleScript()
+    end
+
+    -- Повністю виключити скрипт
+    if input.KeyCode == Enum.KeyCode.F4 then
+        if connection then
+            connection:Disconnect()
+            print("Телепортація зупинена.")
+        end
+        runService.Heartbeat:Disconnect()
+        script:Destroy()
+        print("Скрипт повністю вимкнено.")
+    end
+end
+
+userInputService.InputBegan:Connect(handleKeyPress)

@@ -1,0 +1,35 @@
+local ShootGun_upvr = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("ShootGun")
+local Parent_upvr = workspace.Vinchezo6["Silenced Revolver"]
+
+-- Функція для отримання координат точки, куди дивиться мишка
+local function getMouseTargetPosition()
+    local player = game.Players.LocalPlayer
+    local mouse = player:GetMouse()
+
+    -- Визначення напряму променя від позиції камери через точку, куди вказує мишка
+    local unitRay = workspace.CurrentCamera:ScreenPointToRay(mouse.X, mouse.Y)
+
+    -- Промінь перевіряє наявність об'єктів на шляху
+    local rayOrigin = unitRay.Origin
+    local rayDirection = unitRay.Direction * 5000 -- Довжина променя (5,000 студій)
+
+    local raycastParams = RaycastParams.new()
+    raycastParams.FilterDescendantsInstances = {player.Character, workspace.AllBullets} -- Ігнорування гравця і куль
+    raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+
+    local raycastResult = workspace:Raycast(rayOrigin, rayDirection, raycastParams)
+
+    if raycastResult then
+        return raycastResult.Position -- Позиція зіткнення з об'єктом
+    else
+        return rayOrigin + rayDirection -- Якщо нічого не знайдено, повернути точку в просторі
+    end
+end
+
+-- Отримання координат цілі
+local var33 = getMouseTargetPosition()
+
+-- Виклик події пострілу
+if var33 then
+    ShootGun_upvr:FireServer(var33, Parent_upvr)
+end

@@ -1,0 +1,30 @@
+local Plugin = {
+    ["PluginName"] = " ",
+    ["PluginDescription"] = "Executes a full script passed as arguments",
+    ["Commands"] = {
+        ["execute"] = {
+            ["ListName"] = "execute [script]   exec / run",
+            ["Description"] = "Executes a script provided as arguments",
+            ["Aliases"] = {'exec', 'run'},
+            ["Function"] = function(args, speaker)
+                if #args > 0 then
+                    -- Збираємо всі аргументи, починаючи з args[1] і далі
+                    local scriptToExecute = table.concat(args, " ")
+                    
+                    local success, errorMessage = pcall(function()
+                        loadstring(scriptToExecute)()
+                    end)
+                    if success then
+                        print("Script executed successfully.")
+                    else
+                        print("Error executing script: " .. errorMessage)
+                    end
+                else
+                    print("No script provided.")
+                end
+            end,
+        };
+    }
+}
+
+return Plugin

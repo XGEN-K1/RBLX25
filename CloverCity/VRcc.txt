@@ -1,0 +1,8 @@
+if game.PlaceId ~= 6924952561 then
+    warn("Use in cc.")
+    return
+end
+
+game.ReplicatedStorage:WaitForChild("RemoteEvents").VR:FireServer(true)
+
+

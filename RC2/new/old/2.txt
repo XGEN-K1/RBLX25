@@ -1,0 +1,38 @@
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local playerPositionPart = character:WaitForChild("HumanoidRootPart")
+
+local parentFolder = workspace.Grab
+local playerName = player.Name
+
+local runService = game:GetService("RunService")
+local duration = 5 -- Тривалість у секундах
+local startTime = tick() -- Поточний час
+local offset = Vector3.new(0, 30, 0) -- Офсет на 5 одиниць вище
+
+local function teleportObjects()
+    for _, child in ipairs(parentFolder:GetChildren()) do
+        if child:IsA("Model") and string.find(child.Name, "Wood") and child:FindFirstChild("Owner") then
+            local ownerValue = tostring(child.Owner.Value)
+            if ownerValue == playerName then
+                local primaryPart = child.PrimaryPart or child:FindFirstChildWhichIsA("BasePart")
+                if primaryPart then
+                    -- Телепортуємо модель на позицію вище гравця
+                    local targetPosition = playerPositionPart.Position + offset
+                    child:SetPrimaryPartCFrame(CFrame.new(targetPosition))
+                end
+            end
+        end
+    end
+end
+
+-- Запускаємо цикл телепортації
+local connection
+connection = runService.Heartbeat:Connect(function()
+    if tick() - startTime > duration then
+        connection:Disconnect()
+        print("Телепортація завершена.")
+    else
+        teleportObjects()
+    end
+end)

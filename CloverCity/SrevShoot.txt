@@ -1,0 +1,401 @@
+-- Decompiler will be improved soon!
+-- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/wyButjTMhM)
+-- Decompiled on 2025-01-28 13:21:57
+-- Luau version 6, Types version 3
+-- Time taken: 0.008807 seconds
+
+local Parent_upvr = script.Parent
+local LocalPlayer_upvr = game.Players.LocalPlayer
+local var3
+if not var3 then
+    var3 = LocalPlayer_upvr.CharacterAdded:wait()
+end
+local Humanoid = var3:WaitForChild("Humanoid")
+local mouse_upvr = LocalPlayer_upvr:GetMouse()
+local CurrentCamera_upvr = game.Workspace.CurrentCamera
+local UserInputService_2_upvr = game:GetService("UserInputService")
+local ShootGun_upvr = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("ShootGun")
+local ReloadGun_upvr = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("ReloadGun")
+local var10_upvw = false
+local var11_upvw = false
+local var12_upvw
+local var13_upvw
+local var14_upvw
+local var15_upvw
+local any_LoadAnimation_result1_upvr_2 = Humanoid:WaitForChild("Animator"):LoadAnimation(game.ReplicatedStorage.PlayerAnimations.PistolGrip)
+local any_LoadAnimation_result1_upvr_3 = Humanoid:WaitForChild("Animator"):LoadAnimation(game.ReplicatedStorage.PlayerAnimations.PistolRecoil)
+local any_LoadAnimation_result1_upvr = Humanoid:WaitForChild("Animator"):LoadAnimation(game.ReplicatedStorage.PlayerAnimations.RifleGripRecoil)
+mouse_upvr.Icon = ""
+local UserInputService = game:GetService("UserInputService")
+local var20_upvw
+if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled then
+    var20_upvw = true
+end
+if UserInputService:GetLastInputType() == Enum.UserInputType.Touch then
+    var20_upvw = true
+else
+    var20_upvw = false
+end
+UserInputService.LastInputTypeChanged:Connect(function(arg1) -- Line 51, Named "onInputTypeChanged"
+    --[[ Upvalues[1]:
+        [1]: var20_upvw (read and write)
+    ]]
+    if arg1 == Enum.UserInputType.Touch then
+        var20_upvw = true
+    else
+        var20_upvw = false
+    end
+end)
+local function _() -- Line 65, Named "updateUI"
+    --[[ Upvalues[6]:
+        [1]: var10_upvw (read and write)
+        [2]: var14_upvw (read and write)
+        [3]: Parent_upvr (readonly)
+        [4]: var15_upvw (read and write)
+        [5]: var12_upvw (read and write)
+        [6]: var13_upvw (read and write)
+    ]]
+    if var10_upvw then
+        var14_upvw.Text = Parent_upvr.Stats.StoredAmmo.Value
+        var15_upvw.Text = var14_upvw.Text
+        var12_upvw.Text = Parent_upvr.Stats.LoadedAmmo.Value
+        var13_upvw.Text = var12_upvw.Text
+    end
+end
+local Value_upvr = Parent_upvr:WaitForChild("Stats"):WaitForChild("Recoil").Value
+local var22_upvr = Value_upvr / 2
+local function ShootRecoil_upvr() -- Line 81, Named "ShootRecoil"
+    --[[ Upvalues[4]:
+        [1]: Parent_upvr (readonly)
+        [2]: var22_upvr (readonly)
+        [3]: Value_upvr (readonly)
+        [4]: CurrentCamera_upvr (readonly)
+    ]]
+    if 0 < Parent_upvr.Stats.LoadedAmmo.Value then
+        CurrentCamera_upvr.CFrame *= CFrame.Angles(math.rad(math.random(var22_upvr) / 1000, math.random(Value_upvr) / 1000), math.rad(math.random(-var22_upvr, var22_upvr) / 2000), 0)
+    end
+end
+local Cursor_upvr = LocalPlayer_upvr.PlayerGui:WaitForChild("ShiftLock").Cursor
+local const_number_upvw_3 = 0
+local const_number_upvw_2 = 0
+local const_number_upvw = 0
+local function hitMarkers_upvr(arg1) -- Line 93, Named "hitMarkers"
+    --[[ Upvalues[4]:
+        [1]: Cursor_upvr (readonly)
+        [2]: const_number_upvw_3 (read and write)
+        [3]: const_number_upvw_2 (read and write)
+        [4]: const_number_upvw (read and write)
+    ]]
+    -- KONSTANTERROR: [0] 1. Error Block 1 start (CF ANALYSIS FAILED)
+    -- KONSTANTERROR: [0] 1. Error Block 1 end (CF ANALYSIS FAILED)
+    -- KONSTANTERROR: [28] 20. Error Block 3 start (CF ANALYSIS FAILED)
+    Cursor_upvr.Hitmark1.Visible = false
+    do
+        return
+    end
+    -- KONSTANTERROR: [28] 20. Error Block 3 end (CF ANALYSIS FAILED)
+    -- KONSTANTERROR: [35] 25. Error Block 4 start (CF ANALYSIS FAILED)
+    -- KONSTANTERROR: [35] 25. Error Block 4 end (CF ANALYSIS FAILED)
+end
+local function _() -- Line 123, Named "shootAnimationF"
+    --[[ Upvalues[3]:
+        [1]: var11_upvw (read and write)
+        [2]: any_LoadAnimation_result1_upvr (readonly)
+        [3]: any_LoadAnimation_result1_upvr_3 (readonly)
+    ]]
+    if var11_upvw then
+        any_LoadAnimation_result1_upvr:Play()
+    else
+        any_LoadAnimation_result1_upvr_3:Play()
+    end
+end
+local function ViewportPointToWorldCoordinates_upvr() -- Line 131, Named "ViewportPointToWorldCoordinates"
+    --[[ Upvalues[2]:
+        [1]: CurrentCamera_upvr (readonly)
+        [2]: LocalPlayer_upvr (readonly)
+    ]]
+    local any_ViewportPointToRay_result1 = workspace.CurrentCamera:ViewportPointToRay(CurrentCamera_upvr.ViewportSize.X / 2, CurrentCamera_upvr.ViewportSize.Y / 2)
+    local _, workspace_FindPartOnRayWithIgnoreList_result2 = workspace:FindPartOnRayWithIgnoreList(Ray.new(any_ViewportPointToRay_result1.Origin, any_ViewportPointToRay_result1.Direction * 5000), {LocalPlayer_upvr.Character, game.Workspace.AllBullets})
+    return workspace_FindPartOnRayWithIgnoreList_result2
+end
+local var31_upvw = false
+local function leftClickDown_upvr(arg1) -- Line 144, Named "leftClickDown"
+    --[[ Upvalues[13]:
+        [1]: var10_upvw (read and write)
+        [2]: LocalPlayer_upvr (readonly)
+        [3]: Parent_upvr (readonly)
+        [4]: ReloadGun_upvr (readonly)
+        [5]: var20_upvw (read and write)
+        [6]: ViewportPointToWorldCoordinates_upvr (readonly)
+        [7]: mouse_upvr (readonly)
+        [8]: var31_upvw (read and write)
+        [9]: var11_upvw (read and write)
+        [10]: any_LoadAnimation_result1_upvr (readonly)
+        [11]: any_LoadAnimation_result1_upvr_3 (readonly)
+        [12]: ShootRecoil_upvr (readonly)
+        [13]: ShootGun_upvr (readonly)
+    ]]
+    if var10_upvw then
+        if Parent_upvr.Stats.LoadedAmmo.Value <= 0 and game.ReplicatedStorage.PlayerStatStorage:FindFirstChild(LocalPlayer_upvr.Name).Settings.AutoReload.Value then
+            ReloadGun_upvr:FireServer(Parent_upvr, "RevReload")
+        end
+        local function INLINED() -- Internal function, doesn't exist in bytecode
+            local var33
+            return var20_upvw == false
+        end
+        if arg1 or INLINED() then
+            if arg1 then
+                var33 = ViewportPointToWorldCoordinates_upvr()
+            else
+                var33 = mouse_upvr.Hit.p
+            end
+            mouse_upvr.TargetFilter = game.Workspace.AllBullets
+            if var31_upvw == false and game.ReplicatedStorage.PlayerStatStorage[LocalPlayer_upvr.Name].IsHeld.Value == false then
+                var31_upvw = true
+                if var11_upvw then
+                    any_LoadAnimation_result1_upvr:Play()
+                else
+                    any_LoadAnimation_result1_upvr_3:Play()
+                end
+                ShootRecoil_upvr()
+                delay(Parent_upvr.Stats.FireRate.Value, function() -- Line 163
+                    --[[ Upvalues[1]:
+                        [1]: var31_upvw (copied, read and write)
+                    ]]
+                    var31_upvw = false
+                end)
+            end
+            ShootGun_upvr:FireServer(var33, Parent_upvr)
+        end
+    end
+end
+if UserInputService_2_upvr.TouchEnabled then
+    UserInputService_2_upvr.TouchTap:Connect(function(arg1, arg2) -- Line 200, Named "TouchTap"
+        --[[ Upvalues[5]:
+            [1]: var10_upvw (read and write)
+            [2]: LocalPlayer_upvr (readonly)
+            [3]: leftClickDown_upvr (readonly)
+            [4]: Parent_upvr (readonly)
+            [5]: ReloadGun_upvr (readonly)
+        ]]
+        if var10_upvw then
+            local SOME = game.ReplicatedStorage.PlayerStatStorage:FindFirstChild(LocalPlayer_upvr.Name)
+            if SOME and SOME.MouseLocked.Value and arg2 == false then
+                leftClickDown_upvr(true)
+            end
+            if Parent_upvr.Stats.LoadedAmmo.Value <= 0 then
+                ReloadGun_upvr:FireServer(Parent_upvr, "RevReload")
+            end
+        end
+    end)
+end
+Parent_upvr.Stats.LoadedAmmo.Changed:Connect(function(arg1) -- Line 217
+    --[[ Upvalues[6]:
+        [1]: var10_upvw (read and write)
+        [2]: var14_upvw (read and write)
+        [3]: Parent_upvr (readonly)
+        [4]: var15_upvw (read and write)
+        [5]: var12_upvw (read and write)
+        [6]: var13_upvw (read and write)
+    ]]
+    if var10_upvw then
+        var14_upvw.Text = Parent_upvr.Stats.StoredAmmo.Value
+        var15_upvw.Text = var14_upvw.Text
+        var12_upvw.Text = Parent_upvr.Stats.LoadedAmmo.Value
+        var13_upvw.Text = var12_upvw.Text
+    end
+end)
+Parent_upvr.Stats.StoredAmmo.Changed:Connect(function(arg1) -- Line 220
+    --[[ Upvalues[6]:
+        [1]: var10_upvw (read and write)
+        [2]: var14_upvw (read and write)
+        [3]: Parent_upvr (readonly)
+        [4]: var15_upvw (read and write)
+        [5]: var12_upvw (read and write)
+        [6]: var13_upvw (read and write)
+    ]]
+    if var10_upvw then
+        var14_upvw.Text = Parent_upvr.Stats.StoredAmmo.Value
+        var15_upvw.Text = var14_upvw.Text
+        var12_upvw.Text = Parent_upvr.Stats.LoadedAmmo.Value
+        var13_upvw.Text = var12_upvw.Text
+    end
+end)
+local TweenInfo_new_result1_upvr = TweenInfo.new(0.2, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0)
+local TweenService_upvr = game:GetService("TweenService")
+Parent_upvr:WaitForChild("HitMark").OnClientEvent:Connect(function(arg1, arg2) -- Line 247
+    --[[ Upvalues[2]:
+        [1]: Parent_upvr (readonly)
+        [2]: hitMarkers_upvr (readonly)
+    ]]
+    if arg1 and arg2 == Parent_upvr then
+        hitMarkers_upvr(arg1)
+    end
+end)
+LocalPlayer_upvr.PlayerGui.ShiftLock.SingleShot.MouseButton1Down:Connect(function() -- Line 254
+    --[[ Upvalues[5]:
+        [1]: var10_upvw (read and write)
+        [2]: LocalPlayer_upvr (readonly)
+        [3]: leftClickDown_upvr (readonly)
+        [4]: Parent_upvr (readonly)
+        [5]: ReloadGun_upvr (readonly)
+    ]]
+    if var10_upvw then
+        local SOME_3 = game.ReplicatedStorage.PlayerStatStorage:FindFirstChild(LocalPlayer_upvr.Name)
+        if SOME_3 and SOME_3.MouseLocked.Value then
+            leftClickDown_upvr(true)
+        end
+        if Parent_upvr.Stats.LoadedAmmo.Value <= 0 then
+            ReloadGun_upvr:FireServer(Parent_upvr, "RevReload")
+        end
+    end
+end)
+local PlaySound_upvr = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("PlaySound")
+local Handle_upvr = Parent_upvr:WaitForChild("Handle")
+mouse_upvr.Button1Down:Connect(leftClickDown_upvr)
+mouse_upvr.Button2Down:Connect(function(arg1) -- Line 227, Named "rightClickDown"
+    --[[ Upvalues[8]:
+        [1]: var10_upvw (read and write)
+        [2]: LocalPlayer_upvr (readonly)
+        [3]: UserInputService_2_upvr (readonly)
+        [4]: var11_upvw (read and write)
+        [5]: any_LoadAnimation_result1_upvr_2 (readonly)
+        [6]: TweenService_upvr (readonly)
+        [7]: CurrentCamera_upvr (readonly)
+        [8]: TweenInfo_new_result1_upvr (readonly)
+    ]]
+    if var10_upvw then
+        if game.ReplicatedStorage.PlayerStatStorage[LocalPlayer_upvr.Name].MouseLocked.Value then
+            UserInputService_2_upvr.MouseDeltaSensitivity = 0.5
+            var11_upvw = true
+            any_LoadAnimation_result1_upvr_2:Play()
+            TweenService_upvr:Create(CurrentCamera_upvr, TweenInfo_new_result1_upvr, {
+                FieldOfView = 50;
+            }):Play()
+        end
+    end
+end)
+mouse_upvr.Button2Up:Connect(function(arg1) -- Line 235, Named "rightClickUp"
+    --[[ Upvalues[7]:
+        [1]: var10_upvw (read and write)
+        [2]: UserInputService_2_upvr (readonly)
+        [3]: var11_upvw (read and write)
+        [4]: TweenService_upvr (readonly)
+        [5]: CurrentCamera_upvr (readonly)
+        [6]: TweenInfo_new_result1_upvr (readonly)
+        [7]: any_LoadAnimation_result1_upvr_2 (readonly)
+    ]]
+    if var10_upvw then
+        UserInputService_2_upvr.MouseDeltaSensitivity = 1
+    end
+    var11_upvw = false
+    TweenService_upvr:Create(CurrentCamera_upvr, TweenInfo_new_result1_upvr, {
+        FieldOfView = 70;
+    }):Play()
+    if any_LoadAnimation_result1_upvr_2 then
+        any_LoadAnimation_result1_upvr_2:Stop()
+    end
+end)
+game:GetService("UserInputService").TouchTapInWorld:Connect(function(arg1, arg2) -- Line 173, Named "getMobilePosition"
+    --[[ Upvalues[10]:
+        [1]: var10_upvw (read and write)
+        [2]: LocalPlayer_upvr (readonly)
+        [3]: var11_upvw (read and write)
+        [4]: any_LoadAnimation_result1_upvr (readonly)
+        [5]: any_LoadAnimation_result1_upvr_3 (readonly)
+        [6]: ShootRecoil_upvr (readonly)
+        [7]: CurrentCamera_upvr (readonly)
+        [8]: ShootGun_upvr (readonly)
+        [9]: Parent_upvr (readonly)
+        [10]: ReloadGun_upvr (readonly)
+    ]]
+    if var10_upvw then
+        local SOME_2 = game.ReplicatedStorage.PlayerStatStorage:FindFirstChild(LocalPlayer_upvr.Name)
+        if SOME_2 and SOME_2.MouseLocked.Value == false then
+            if arg2 then return end
+            if SOME_2.JustShot.Value == false then
+                if var11_upvw then
+                    any_LoadAnimation_result1_upvr:Play()
+                else
+                    any_LoadAnimation_result1_upvr_3:Play()
+                end
+                ShootRecoil_upvr()
+            end
+            local any_ViewportPointToRay_result1_3 = CurrentCamera_upvr:ViewportPointToRay(arg1.X, arg1.Y)
+            local _, any_FindPartOnRayWithIgnoreList_result2 = game.Workspace:FindPartOnRayWithIgnoreList(Ray.new(any_ViewportPointToRay_result1_3.Origin, any_ViewportPointToRay_result1_3.Direction * 2000), {LocalPlayer_upvr.Character, game.Workspace.AllBullets})
+            ShootGun_upvr:FireServer(any_FindPartOnRayWithIgnoreList_result2, Parent_upvr)
+            if Parent_upvr.Stats.LoadedAmmo.Value == 0 and var10_upvw then
+                ReloadGun_upvr:FireServer(Parent_upvr, "RevReload")
+            end
+        end
+    end
+end)
+Parent_upvr.Unequipped:Connect(function() -- Line 266, Named "onUnequipped"
+    --[[ Upvalues[9]:
+        [1]: var12_upvw (read and write)
+        [2]: var13_upvw (read and write)
+        [3]: var14_upvw (read and write)
+        [4]: var15_upvw (read and write)
+        [5]: var10_upvw (read and write)
+        [6]: var20_upvw (read and write)
+        [7]: UserInputService_2_upvr (readonly)
+        [8]: LocalPlayer_upvr (readonly)
+        [9]: any_LoadAnimation_result1_upvr_2 (readonly)
+    ]]
+    var12_upvw.Visible = false
+    var13_upvw.Visible = false
+    var14_upvw.Visible = false
+    var15_upvw.Visible = false
+    var10_upvw = false
+    if var20_upvw == false then
+        UserInputService_2_upvr.MouseIconEnabled = true
+        LocalPlayer_upvr.PlayerGui.ShiftLock.Cursor.Visible = false
+    end
+    if any_LoadAnimation_result1_upvr_2 then
+        any_LoadAnimation_result1_upvr_2:Stop()
+    end
+    if var20_upvw then
+        LocalPlayer_upvr.PlayerGui.Bars.MobileButtons.Reload.Visible = false
+    end
+end)
+Parent_upvr.Equipped:Connect(function() -- Line 288, Named "onEquipped"
+    --[[ Upvalues[12]:
+        [1]: LocalPlayer_upvr (readonly)
+        [2]: var12_upvw (read and write)
+        [3]: var13_upvw (read and write)
+        [4]: var14_upvw (read and write)
+        [5]: var15_upvw (read and write)
+        [6]: var11_upvw (read and write)
+        [7]: var10_upvw (read and write)
+        [8]: var20_upvw (read and write)
+        [9]: PlaySound_upvr (readonly)
+        [10]: Handle_upvr (readonly)
+        [11]: Parent_upvr (readonly)
+        [12]: UserInputService_2_upvr (readonly)
+    ]]
+    var12_upvw = LocalPlayer_upvr.PlayerGui:WaitForChild("Bars").LoadedAmmo
+    var13_upvw = LocalPlayer_upvr.PlayerGui:WaitForChild("Bars").LoadedAmmoShadow
+    var14_upvw = LocalPlayer_upvr.PlayerGui:WaitForChild("Bars").Ammo
+    var15_upvw = LocalPlayer_upvr.PlayerGui:WaitForChild("Bars").AmmoShadow
+    var11_upvw = false
+    var10_upvw = true
+    if var20_upvw then
+        LocalPlayer_upvr.PlayerGui.Bars.MobileButtons.Reload.Visible = true
+    end
+    task.wait(0.1)
+    var14_upvw.Visible = true
+    var15_upvw.Visible = true
+    var12_upvw.Visible = true
+    var13_upvw.Visible = true
+    PlaySound_upvr:FireServer(Handle_upvr.Equip, Parent_upvr)
+    if var10_upvw then
+        var14_upvw.Text = Parent_upvr.Stats.StoredAmmo.Value
+        var15_upvw.Text = var14_upvw.Text
+        var12_upvw.Text = Parent_upvr.Stats.LoadedAmmo.Value
+        var13_upvw.Text = var12_upvw.Text
+    end
+    if var20_upvw == false then
+        UserInputService_2_upvr.MouseIconEnabled = false
+        LocalPlayer_upvr.PlayerGui.ShiftLock.Cursor.Visible = true
+    end
+end)

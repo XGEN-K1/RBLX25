@@ -1,0 +1,25 @@
+-- Задайте тут юзернейм цілі
+local targetUsername = "XGEN_K9"
+
+local ShootGun_upvr = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("ShootGun")
+local Parent_upvr = workspace[targetUsername]:FindFirstChildOfClass("Tool") -- Шукай інструмент у вказаного персонажа
+
+-- Функція для отримання координат точки на голові персонажа
+local function getHeadPosition()
+    local character = workspace[targetUsername] -- Використовуємо юзернейм для доступу до персонажа
+    local head = character:FindFirstChild("Head") -- Знаходимо голову персонажа
+
+    if head then
+        return head.Position -- Повертаємо позицію голови
+    else
+        return nil -- Якщо голова не знайдена, повертаємо nil
+    end
+end
+
+-- Отримання координат цілі
+local var33 = getHeadPosition()
+
+-- Переконаємось, що варіант правильно переданий, як Vector3
+if var33 and Parent_upvr then
+    ShootGun_upvr:FireServer(var33, Parent_upvr)
+end

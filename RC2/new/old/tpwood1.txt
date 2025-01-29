@@ -1,0 +1,26 @@
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local playerPosition = character:WaitForChild("HumanoidRootPart").Position
+
+local parentFolder = workspace.Grab
+local playerName = player.Name
+local count = 0
+
+for _, child in ipairs(parentFolder:GetChildren()) do
+    if child:IsA("Model") and string.find(child.Name, "Wood") and child:FindFirstChild("Owner") then
+        local ownerValue = tostring(child.Owner.Value)
+        if ownerValue == playerName then
+            local primaryPart = child.PrimaryPart or child:FindFirstChildWhichIsA("BasePart")
+            if primaryPart then
+                -- Телепортуємо модель до позиції гравця
+                child:SetPrimaryPartCFrame(CFrame.new(playerPosition))
+                print("Телепортовано:", child.Name)
+                count = count + 1
+            else
+                print("У моделі немає PrimaryPart:", child.Name)
+            end
+        end
+    end
+end
+
+print("Телепортовано об'єктів:", count)

@@ -1,0 +1,21 @@
+local MarketplaceService = game:GetService("MarketplaceService")
+local Players = game:GetService("Players")
+
+-- Функція для отримання OutfitId з BundleId
+local function GetOutfitIdFromBundleId(id)
+    local BundleInfo = MarketplaceService:GetProductInfo(id, Enum.InfoType.Bundle)
+    for i, item in BundleInfo.Items do
+        if item.Type == "UserOutfit" then
+            return item.Id
+        end
+    end
+end
+
+-- Створення HumanoidDescription з BundleId
+local BundleId = 1648502 -- Замість цього вставте потрібний ID бандлу
+local OutfitId = GetOutfitIdFromBundleId(BundleId)
+local Description = Players:GetHumanoidDescriptionFromOutfitId(OutfitId)
+
+-- Створення моделі персонажа з опису бандлу
+local Model = Players:CreateHumanoidModelFromDescription(Description, Enum.HumanoidRigType.R15)
+Model.Parent = workspace

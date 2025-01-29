@@ -1,0 +1,33 @@
+local ShootGun_upvr = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("ShootGun")
+local ReloadGun_upvr = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("ReloadGun")
+
+-- Таблиця для відповідності назв Tool і аргументів для івента
+local toolReloadArgs = {
+    ["Silenced Revolver"] = "RevReload",
+    ["Dual Beretta"] = "DualReload",
+    ["SKS"] = "PistolReload",
+    -- Додайте інші Tool та їхні аргументи тут
+}
+
+-- Шукаємо будь-який Tool у папці workspace.XGEN_K9
+local Parent_upvr
+local toolsFolder = workspace.XGEN_K9
+for _, child in pairs(toolsFolder:GetChildren()) do
+    if child:IsA("Tool") then
+        Parent_upvr = child
+        break
+    end
+end
+
+-- Перевіряємо, чи знайдено Tool
+if not Parent_upvr then
+    warn("Tool не знайдено в папці workspace.XGEN_K9")
+else
+    -- Отримуємо аргумент для івента з таблиці
+    local reloadArg = toolReloadArgs[Parent_upvr.Name]
+    if reloadArg then
+        ReloadGun_upvr:FireServer(Parent_upvr, reloadArg)
+    else
+        warn("Аргумент для івента не знайдено для Tool: " .. Parent_upvr.Name)
+    end
+end

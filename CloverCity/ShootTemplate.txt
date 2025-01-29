@@ -1,0 +1,27 @@
+local ShootGun_upvr = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("ShootGun")
+local Parent_upvr = workspace.Vinchezo6["Silenced Revolver"]
+
+-- Функція для отримання координат цілі (var33)
+local function getTargetPosition()
+    local LocalPlayer_upvr = game.Players.LocalPlayer
+    local CurrentCamera_upvr = game.Workspace.CurrentCamera
+    
+    -- Створення променя від центру екрану
+    local ray = CurrentCamera_upvr:ViewportPointToRay(CurrentCamera_upvr.ViewportSize.X / 2, CurrentCamera_upvr.ViewportSize.Y / 2)
+    
+    -- Перевірка на перешкоди
+    local _, hitPosition = workspace:FindPartOnRayWithIgnoreList(
+        Ray.new(ray.Origin, ray.Direction * 5000), -- Довжина променя
+        {LocalPlayer_upvr.Character, workspace.AllBullets} -- Список для ігнорування
+    )
+    
+    return hitPosition
+end
+
+-- Отримання цільової позиції
+local var33 = getTargetPosition()
+
+-- Виклик події пострілу
+if var33 then
+    ShootGun_upvr:FireServer(var33, Parent_upvr)
+end

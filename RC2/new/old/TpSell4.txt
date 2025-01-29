@@ -1,0 +1,54 @@
+local playerNameToTeleport = "" -- Залиште порожнім для локального гравця або вкажіть ім'я іншого гравця
+local parentFolder = workspace.Grab
+local targetPosition = Vector3.new(1438, 26, 182) -- Точки, куди телепортуємо
+local teleportDuration = 3 -- Тривалість телепортації в секундах
+local teleportInterval = 0.2 -- Інтервал між телепортацією об'єктів (в секундах)
+
+-- Вимкнення перевірки на анкеровані об'єкти (true = tpall, false = unanchored)
+local checkAnchored = true
+
+-- Список ключових слів для пошуку в назвах моделей
+local searchKeywords = {"Wood", "Fish"}
+
+-- Функція для перевірки чи містить назва елемента одне з ключових слів
+local function matchesSearchKeywords(name)
+    for _, keyword in ipairs(searchKeywords) do
+        if string.find(name, keyword) then
+            return true
+        end
+    end
+    return false
+end
+
+local function teleportObjects()
+    -- Якщо поле для імені порожнє, використовуємо локального гравця
+    local playerName = playerNameToTeleport == "" and game.Players.LocalPlayer.Name or playerNameToTeleport
+
+    local startTime = tick()
+    local endTime = startTime + teleportDuration
+
+    while tick() < endTime do
+        for _, child in ipairs(parentFolder:GetChildren()) do
+            if tick() >= endTime then
+                return -- Вийдемо з функції, якщо час вичерпано
+            end
+
+            if child:IsA("Model") and matchesSearchKeywords(child.Name) and child:FindFirstChild("Owner") then
+                local ownerValue = tostring(child.Owner.Value)
+                if ownerValue == playerName then
+                    local primaryPart = child.PrimaryPart or child:FindFirstChildWhichIsA("BasePart")
+
+                    -- Якщо перевірка на анкеровані об'єкти включена
+                    if primaryPart and (not primaryPart.Anchored or checkAnchored) then
+                        -- Телепортуємо об'єкт на задані координати
+                        child:SetPrimaryPartCFrame(CFrame.new(targetPosition))
+                    end
+                end
+            end
+        end
+        wait(teleportInterval) -- Затримка перед телепортацією наступного об'єкта
+    end
+end
+
+teleportObjects()
+print("Телепортація завершена.")
