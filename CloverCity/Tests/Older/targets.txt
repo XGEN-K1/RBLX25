@@ -1,0 +1,80 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Radius = 30
+local Duration = 10
+local Active = true
+
+-- Функція для створення маркера
+local function createCircle(player)
+    local char = player.Character
+    if char and char:FindFirstChild("Head") then
+        local head = char.Head
+        
+        local billboard = Instance.new("BillboardGui")
+        billboard.Name = "PlayerMarker"
+        billboard.Adornee = head
+        billboard.Size = UDim2.new(2, 0, 2, 0)
+        billboard.AlwaysOnTop = true
+        billboard.Parent = head
+        
+        local frame = Instance.new("Frame")
+        frame.Size = UDim2.new(1, 0, 1, 0)
+        frame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        frame.BackgroundTransparency = 0.3
+        frame.Parent = billboard
+        
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(1, 0)
+        corner.Parent = frame
+    end
+end
+
+-- Функція для видалення маркера
+local function removeCircle(player)
+    local char = player.Character
+    if char and char:FindFirstChild("Head") then
+        local marker = char.Head:FindFirstChild("PlayerMarker")
+        if marker then
+            marker:Destroy()
+        end
+    end
+end
+
+-- Основний цикл перевірки гравців у радіусі
+local function checkPlayers()
+    while Active do
+        local character = LocalPlayer.Character
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            local rootPart = character.HumanoidRootPart
+            for _, player in pairs(Players:GetPlayers()) do
+                local char = player.Character
+                if char and char:FindFirstChild("HumanoidRootPart") then
+                    local distance = (char.HumanoidRootPart.Position - rootPart.Position).Magnitude
+                    if distance <= Radius then
+                        if not char.Head:FindFirstChild("PlayerMarker") then
+                            createCircle(player)
+                        end
+                    else
+                        removeCircle(player)
+                    end
+                end
+            end
+        end
+        wait(0.2) -- Перевірка кожні 0.2 секунди
+    end
+    -- Видаляємо всі маркери після закінчення
+    for _, player in pairs(Players:GetPlayers()) do
+        removeCircle(player)
+    end
+end
+
+-- Запуск перевірки
+spawn(function()
+    checkPlayers()
+end)
+
+-- Таймер закінчення дії
+wait(Duration)
+Active = false

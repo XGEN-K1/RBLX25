@@ -1,0 +1,9 @@
+local Sound = "8323804973"
+local TOGGLE = 1
+
+local Music_upvr = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents").Music 
+if TOGGLE==1 then
+	Music_upvr:FireServer(Sound, true) --START
+else	
+	Music_upvr:FireServer(0, false)   --STOP
+end

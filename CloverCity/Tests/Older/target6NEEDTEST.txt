@@ -1,0 +1,194 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
+local ShootGun_upvr = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("ShootGun")
+
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Radius = 20 -- Радіус виявлення гравців
+local Active = false -- Спочатку скрипт не активний
+local scriptEnabled = true -- Прапор для перевірки чи активний скрипт
+
+-- Функція для створення маркера
+local function createCircle(player)
+    local char = player.Character
+    if char and char:FindFirstChild("Head") then
+        local head = char.Head
+        
+        local billboard = Instance.new("BillboardGui")
+        billboard.Name = "PlayerMarker"
+        billboard.Adornee = head
+        billboard.Size = UDim2.new(2, 0, 2, 0)
+        billboard.AlwaysOnTop = true
+        billboard.Parent = head
+        
+        local frame = Instance.new("Frame")
+        frame.Size = UDim2.new(1, 0, 1, 0)
+        frame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        frame.BackgroundTransparency = 0.3
+        frame.Parent = billboard
+        
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(1, 0)
+        corner.Parent = frame
+    end
+end
+
+-- Функція для видалення маркера
+local function removeCircle(player)
+    local char = player.Character
+    if char and char:FindFirstChild("Head") then
+        local marker = char.Head:FindFirstChild("PlayerMarker")
+        if marker then
+            marker:Destroy()
+        end
+    end
+end
+
+-- Основний цикл перевірки гравців у радіусі
+local function checkPlayers()
+    while Active do
+        local character = LocalPlayer.Character
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            local rootPart = character.HumanoidRootPart
+            for _, player in pairs(Players:GetPlayers()) do
+                if player ~= LocalPlayer then -- Не застосовуємо маркер до себе
+                    local char = player.Character
+                    if char and char:FindFirstChild("HumanoidRootPart") then
+                        local distance = (char.HumanoidRootPart.Position - rootPart.Position).Magnitude
+                        if distance <= Radius then
+                            if not char.Head:FindFirstChild("PlayerMarker") then
+                                createCircle(player)
+                            end
+                        else
+                            removeCircle(player)
+                        end
+                    end
+                end
+            end
+        end
+        wait(0.2) -- Перевірка кожні 0.2 секунди
+    end
+    -- Видаляємо всі маркери після закінчення
+    for _, player in pairs(Players:GetPlayers()) do
+        removeCircle(player)
+    end
+end
+
+-- Функція для отримання всіх гравців із маркерами
+local function getMarkedPlayers()
+    local markedPlayers = {}
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            local char = player.Character
+            if char and char:FindFirstChild("Head") and char.Head:FindFirstChild("PlayerMarker") then
+                table.insert(markedPlayers, player)
+            end
+        end
+    end
+    return markedPlayers
+end
+
+-- Функція для отримання координат голови персонажа
+local function getHeadPosition(player)
+    local char = player.Character
+    if char then
+        local head = char:FindFirstChild("Head")
+        if head then
+            return head.Position
+        end
+    end
+    return nil
+end
+
+-- Функція для перевірки, чи має інструмент папку Stats і значення ClipSize
+local function hasValidTool(character)
+    local tool = character:FindFirstChildOfClass("Tool")
+    if tool then
+        local stats = tool:FindFirstChild("Stats")
+        if stats and stats:FindFirstChild("ClipSize") then
+            return tool
+        end
+    end
+    -- Якщо інструмент не підходить, шукаємо інший в тій же інвентарі
+    for _, child in pairs(character:GetChildren()) do
+        if child:IsA("Tool") then
+            local stats = child:FindFirstChild("Stats")
+            if stats and stats:FindFirstChild("ClipSize") then
+                return child
+            end
+        end
+    end
+    return nil
+end
+
+-- Функція стрільби по всіх гравцях із маркерами
+local function shootAtMarkedPlayers()
+    while Active do
+        local markedPlayers = getMarkedPlayers()
+        for _, player in pairs(markedPlayers) do
+            local headPos = getHeadPosition(player)
+            local char = player.Character
+            if headPos and char then
+                -- Перевірка інструменту
+                local tool = hasValidTool(char)
+                if tool then
+                    ShootGun_upvr:FireServer(headPos, tool)
+                end
+            end
+        end
+        wait(0.1) -- Інтервал стрільби кожні 0.1 секунди
+    end
+end
+
+-- Функція для виведення повідомлення
+local function showNotification(message)
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "SS Script",
+        Text = message,
+        Duration = 2
+    })
+end
+
+-- Обробка натискання клавіші "K" для активації/деактивації скрипта
+UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    if gameProcessedEvent then return end
+    if input.KeyCode == Enum.KeyCode.K and scriptEnabled then
+        Active = not Active -- Змінюємо статус активності
+        if Active then
+            -- Запуск перевірки гравців у радіусі
+            spawn(checkPlayers)
+            -- Запуск стрільби по всіх помічених гравцях
+            spawn(shootAtMarkedPlayers)
+            -- Вивести повідомлення про активацію
+            showNotification("SSOn")
+        else
+            -- Вивести повідомлення про деактивацію
+            showNotification("SSOff")
+        end
+    end
+end)
+
+-- Глобальна функція для зупинки скрипта та видалення маркерів
+_G.SSDestroy = function()
+    -- Вимикаємо активність скрипта
+    Active = false
+    -- Зупиняємо всі обробники натискання клавіші
+    scriptEnabled = false
+    
+    -- Видаляємо маркери для всіх гравців
+    for _, player in pairs(Players:GetPlayers()) do
+        removeCircle(player)
+    end
+    
+    -- Очищаємо усі фонові цикли
+    spawn(function()
+        -- Видалення функцій, що працюють в фоновому режимі
+        -- Оскільки ми припинили Active, вони припиняться автоматично
+        wait(1) -- чекаємо на завершення цих процесів
+    end)
+
+    -- Вивести повідомлення про зупинку
+    showNotification("SSDestroyed")
+end

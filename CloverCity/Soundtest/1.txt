@@ -1,0 +1,6 @@
+local Parent_upvr = workspace.Vinchezo6.AK
+
+local PlaySound_upvr = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("PlaySound")
+local Handle_upvr = Parent_upvr:WaitForChild("Handle")
+
+PlaySound_upvr:FireServer(Handle_upvr.Equip, Parent_upvr)

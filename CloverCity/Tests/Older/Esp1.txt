@@ -1,0 +1,113 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+local LocalPlayer = Players.LocalPlayer
+local Active = false
+local ScriptDisabled = false
+local inputConnection
+
+local function createMarker(player)
+    local char = player.Character
+    if char and char:FindFirstChild("Head") then
+        local head = char.Head
+        local billboard = Instance.new("BillboardGui")
+        billboard.Name = "PlayerMarker"
+        billboard.Adornee = head
+        billboard.Size = UDim2.new(4, 0, 2, 0)
+        billboard.StudsOffset = Vector3.new(0, 2.5, 0)
+        billboard.AlwaysOnTop = true
+        billboard.Parent = head
+        
+        local frame = Instance.new("Frame")
+        frame.Size = UDim2.new(1, 0, 1, 0)
+        frame.BackgroundTransparency = 1
+        frame.Parent = billboard
+        
+        local displayNameLabel = Instance.new("TextLabel")
+        displayNameLabel.Size = UDim2.new(1, 0, 0.5, 0)
+        displayNameLabel.Position = UDim2.new(0, 0, 0, 0)
+        displayNameLabel.BackgroundTransparency = 1
+        displayNameLabel.Text = player.DisplayName
+        displayNameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        displayNameLabel.TextScaled = true
+        displayNameLabel.Font = Enum.Font.SourceSansBold
+        displayNameLabel.Parent = frame
+        
+        local usernameLabel = Instance.new("TextLabel")
+        usernameLabel.Size = UDim2.new(1, 0, 0.5, 0)
+        usernameLabel.Position = UDim2.new(0, 0, 0.5, 0)
+        usernameLabel.BackgroundTransparency = 1
+        usernameLabel.Text = "(@" .. player.Name .. ")"
+        usernameLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+        usernameLabel.TextScaled = true
+        usernameLabel.Font = Enum.Font.SourceSans
+        usernameLabel.Parent = frame
+    end
+end
+
+local function removeMarker(player)
+    local char = player.Character
+    if char and char:FindFirstChild("Head") then
+        local marker = char.Head:FindFirstChild("PlayerMarker")
+        if marker then
+            marker:Destroy()
+        end
+    end
+end
+
+local function checkPlayers()
+    while Active do
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer then
+                local char = player.Character
+                if char and char:FindFirstChild("Head") then
+                    if not char.Head:FindFirstChild("PlayerMarker") then
+                        createMarker(player)
+                    end
+                end
+            end
+        end
+        wait(0.5)
+    end
+    for _, player in pairs(Players:GetPlayers()) do
+        removeMarker(player)
+    end
+end
+
+local function showNotification(message)
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "SS Script",
+        Text = message,
+        Duration = 2
+    })
+end
+
+inputConnection = UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    if gameProcessedEvent or ScriptDisabled then return end
+    if input.KeyCode == Enum.KeyCode.K then
+        Active = not Active
+        if Active then
+            spawn(checkPlayers)
+            showNotification("SSOn")
+        else
+            showNotification("SSOff")
+        end
+    end
+end)
+
+_G.SSDestroy = function()
+    Active = false
+    ScriptDisabled = true
+    
+    for _, player in pairs(Players:GetPlayers()) do
+        removeMarker(player)
+    end
+
+    if inputConnection then
+        inputConnection:Disconnect()
+        inputConnection = nil
+    end
+
+    _G.SSDestroy = nil
+    showNotification("SSDestroyed")
+end
