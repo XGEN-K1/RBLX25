@@ -1,0 +1,39 @@
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local rootPart = character:WaitForChild("HumanoidRootPart")
+local rightHand = character:WaitForChild("RightHand")
+local leftHand = character:WaitForChild("LeftHand")
+
+local userInputService = game:GetService("UserInputService")
+local runService = game:GetService("RunService")
+
+local teleporting = false
+
+local function teleportHands()
+    while teleporting do
+        -- Отримуємо позицію курсору мишки
+        local mouse = player:GetMouse()
+        local targetPosition = mouse.Hit.Position
+
+        -- Телепортуємо праву руку
+        rightHand.Position = targetPosition
+
+        -- Телепортуємо ліву руку
+        leftHand.Position = targetPosition + Vector3.new(2, 0, 0) -- Зсув для лівої руки, щоб руки не перекривалися
+
+        -- Чекаємо перед наступною ітерацією
+        runService.Heartbeat:Wait()
+    end
+end
+
+userInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end -- Ігноруємо введення, якщо воно оброблено грою
+
+    if input.KeyCode == Enum.KeyCode.T then
+        teleporting = not teleporting
+        if teleporting then
+            teleportHands()
+        end
+    end
+end)

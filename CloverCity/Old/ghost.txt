@@ -1,0 +1,3 @@
+game.ReplicatedStorage:WaitForChild("RemoteEvents").Ghost:FireServer(true)
+
+

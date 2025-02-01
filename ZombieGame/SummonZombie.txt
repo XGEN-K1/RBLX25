@@ -1,0 +1,4 @@
+for i = 1, 300 do
+    game.ReplicatedStorage.Remotes.ZombieRelated.Necro.AbilityPlayer:FireServer()
+    --task.wait(0.1) -- Невелика пауза, щоб уникнути можливих обмежень
+end

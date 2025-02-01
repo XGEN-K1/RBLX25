@@ -1,0 +1,104 @@
+-- Налаштування кнопки для активації скрипта
+local ACTIVATE_KEY = Enum.KeyCode.M -- Клавіша для активації/деактивації скрипта
+
+-- Основні сервіси
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+-- Локальний гравець
+local LocalPlayer = Players.LocalPlayer
+
+-- Змінні стану
+local Active = false
+local ScriptDisabled = false
+local inputConnection
+
+-- Функція для атаки гравця
+local function attackTarget(player)
+    local char = workspace:FindFirstChild(player.Name)
+    if char then
+        for _, tool in pairs(char:GetChildren()) do
+            if tool:IsA("Tool") and tool:FindFirstChild("MobileCharge") then
+                local mobileCharge = tool:FindFirstChild("MobileCharge")
+                if mobileCharge then
+                    --mobileCharge:FireServer(true)
+                    mobileCharge:FireServer(false)
+                end
+            end
+        end
+    end
+end
+
+-- Функція для атаки всіх гравців
+local function shootAtPlayers()
+    while Active do
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer then
+                attackTarget(player)
+            end
+        end
+        wait(0.1)
+    end
+end
+
+-- Функція для показу сповіщень
+local function showNotification(message)
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "SS Script",
+        Text = message,
+        Duration = 2
+    })
+end
+
+-- Функція для обробки додавання гравця
+local function onPlayerAdded(player)
+    player.CharacterAdded:Connect(function()
+        if Active then
+            attackTarget(player)
+        end
+    end)
+end
+
+-- Функція для обробки видалення гравця
+local function onPlayerRemoved(player)
+    -- Додаткові дії при від'єднанні гравця, якщо потрібно
+end
+
+-- Підключення обробників для існуючих гравців
+for _, player in pairs(Players:GetPlayers()) do
+    if player ~= LocalPlayer then
+        onPlayerAdded(player)
+    end
+end
+
+-- Підключення обробників для нових гравців
+Players.PlayerAdded:Connect(onPlayerAdded)
+Players.PlayerRemoving:Connect(onPlayerRemoved)
+
+-- Підключення обробника введення для активації скрипта
+inputConnection = UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    if gameProcessedEvent or ScriptDisabled then return end
+    if input.KeyCode == ACTIVATE_KEY then
+        Active = not Active
+        if Active then
+            spawn(shootAtPlayers)
+            showNotification("SSOn")
+        else
+            showNotification("SSOff")
+        end
+    end
+end)
+
+-- Функція для знищення скрипта
+_G.SSDestroy = function()
+    Active = false
+    ScriptDisabled = true
+
+    if inputConnection then
+        inputConnection:Disconnect()
+        inputConnection = nil
+    end
+
+    _G.SSDestroy = nil
+    showNotification("SSDestroyed")
+end

@@ -1,0 +1,186 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
+local ShootGun_upvr = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("ReloadGun")
+
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Radius = 9999
+local Active = false
+local scriptEnabled = true
+
+local function createCircle(player)
+    local char = player.Character
+    if char and char:FindFirstChild("Head") then
+        local head = char.Head
+        local billboard = Instance.new("BillboardGui")
+        billboard.Name = "PlayerMarker"
+        billboard.Adornee = head
+        billboard.Size = UDim2.new(2, 0, 2, 0)
+        billboard.AlwaysOnTop = true
+        billboard.Parent = head
+        
+        local frame = Instance.new("Frame")
+        frame.Size = UDim2.new(1, 0, 1, 0)
+        frame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        frame.BackgroundTransparency = 0.3
+        frame.Parent = billboard
+        
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(1, 0)
+        corner.Parent = frame
+    end
+end
+
+local function removeCircle(player)
+    local char = player.Character
+    if char and char:FindFirstChild("Head") then
+        local marker = char.Head:FindFirstChild("PlayerMarker")
+        if marker then
+            marker:Destroy()
+        end
+    end
+end
+
+local function checkPlayers()
+    while Active do
+        local character = LocalPlayer.Character
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            local rootPart = character.HumanoidRootPart
+            for _, player in pairs(Players:GetPlayers()) do
+                if player ~= LocalPlayer then
+                    local char = player.Character
+                    if char and char:FindFirstChild("HumanoidRootPart") then
+                        local distance = (char.HumanoidRootPart.Position - rootPart.Position).Magnitude
+                        if distance <= Radius then
+                            if not char.Head:FindFirstChild("PlayerMarker") then
+                                createCircle(player)
+                            end
+                        else
+                            removeCircle(player)
+                        end
+                    end
+                end
+            end
+        end
+        wait(0.2)
+    end
+    for _, player in pairs(Players:GetPlayers()) do
+        removeCircle(player)
+    end
+end
+
+local function getMarkedPlayers()
+    local markedPlayers = {}
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            local char = player.Character
+            if char and char:FindFirstChild("Head") and char.Head:FindFirstChild("PlayerMarker") then
+                table.insert(markedPlayers, player)
+            end
+        end
+    end
+    return markedPlayers
+end
+
+local function getHeadPosition(player)
+    local char = player.Character
+    if char then
+        local head = char:FindFirstChild("Head")
+        if head then
+            return head.Position
+        end
+    end
+    return nil
+end
+
+local function getValidTool(player)
+    local char = workspace:FindFirstChild(player.Name)
+    if char then
+        for _, tool in pairs(char:GetChildren()) do
+            if tool:IsA("Tool") then
+                local mobileCharge = tool:FindFirstChild("MobileCharge")
+                if mobileCharge then
+                    print("Знайдено MobileCharge у " .. tool.Name)
+                    return tool, "MobileCharge"
+                end
+                
+                local stats = tool:FindFirstChild("Stats")
+                if stats and stats:FindFirstChild("ClipSize") then
+                    print("Знайдено ClipSize у " .. tool.Name)
+                    return tool, "ClipSize"
+                end
+                
+                print("Не підходить: " .. tool.Name)
+            end
+        end
+    end
+    return nil, nil
+end
+
+local function attackTarget(player)
+    local headPos = getHeadPosition(player)
+    local tool, toolType = getValidTool(player)
+    
+    if headPos and tool then
+        if toolType == "MobileCharge" then
+            local mobileCharge = tool:FindFirstChild("MobileCharge")
+            if mobileCharge then
+                print("Активація MobileCharge для " .. tool.Name)
+                mobileCharge:FireServer(true)
+                mobileCharge:FireServer(false)
+            end
+        elseif toolType == "ClipSize" then
+            print("Стрільба з " .. tool.Name)
+            ShootGun_upvr:FireServer(tool, "PistolReload")
+        end
+    end
+end
+
+local function shootAtMarkedPlayers()
+    while Active do
+        local markedPlayers = getMarkedPlayers()
+        for _, player in pairs(markedPlayers) do
+            attackTarget(player)
+        end
+        wait(0.1)
+    end
+end
+
+local function showNotification(message)
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "SS Script",
+        Text = message,
+        Duration = 2
+    })
+end
+
+UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    if gameProcessedEvent then return end
+    if input.KeyCode == Enum.KeyCode.L and scriptEnabled then
+        Active = not Active
+        if Active then
+            spawn(checkPlayers)
+            spawn(shootAtMarkedPlayers)
+            showNotification("SSOn")
+        else
+            showNotification("SSOff")
+        end
+    end
+end)
+
+_G.SSDestroy = function()
+    Active = false
+    scriptEnabled = false
+    
+    for _, player in pairs(Players:GetPlayers()) do
+        removeCircle(player)
+    end
+    
+    spawn(function()
+        wait(1)
+    end)
+
+    showNotification("SSDestroyed")
+end

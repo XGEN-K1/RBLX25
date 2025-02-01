@@ -1,0 +1,143 @@
+local Settings = {
+    rewrittenmain = {
+        Enabled = true,
+        Key = "k", -- Кнопка для вибору цілі
+        ShootKey = "v", -- Кнопка для стрільби
+        DOT = true, -- Підсвічування цілі
+        NOTIF = true, -- Повідомлення про вибір цілі
+        FOV = math.huge, -- Поле зору для вибору цілі
+		interval = 0 --як часто вистріли
+    }
+}
+
+local SelectedPart = "HumanoidRootPart"
+local Plr
+local enabled = false
+local shooting = false
+
+local CC = game:GetService("Workspace").CurrentCamera
+local mouse = game.Players.LocalPlayer:GetMouse()
+local placemarker = Instance.new("Part", game.Workspace)
+placemarker.Anchored = true
+placemarker.CanCollide = false
+placemarker.Size = Vector3.new(0, 0, 0)
+placemarker.Transparency = 0.75
+
+-- Функція для створення маркера
+function makemarker(Parent, Adornee, Color, Size, Size2)
+    local e = Instance.new("BillboardGui", Parent)
+    e.Name = "PP"
+    e.Adornee = Adornee
+    e.Size = UDim2.new(Size, Size2, Size, Size2)
+    e.AlwaysOnTop = Settings.rewrittenmain.DOT
+    local a = Instance.new("Frame", e)
+    a.Size = UDim2.new(0.7, 0, 2.5, 0)
+    a.Transparency = 0
+    a.BackgroundTransparency = 0
+    a.BackgroundColor3 = Color
+    local g = Instance.new("UICorner", a)
+    g.CornerRadius = UDim.new(1, 1)
+    return e
+end
+
+-- Функція для вибору найближчого гравця до курсора
+function getClosestPlayerToCursor()
+    local closestPlayer
+    local shortestDistance = Settings.rewrittenmain.FOV
+
+    for i, v in pairs(game.Players:GetPlayers()) do
+        if v ~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health ~= 0 and v.Character:FindFirstChild("HumanoidRootPart") then
+            local pos = CC:WorldToViewportPoint(v.Character.PrimaryPart.Position)
+            local magnitude = (Vector2.new(pos.X, pos.Y) - Vector2.new(mouse.X, mouse.Y)).magnitude
+            if magnitude < shortestDistance then
+                closestPlayer = v
+                shortestDistance = magnitude
+            end
+        end
+    end
+    return closestPlayer
+end
+
+-- Функція для повідомлення про вибір цілі
+function TargetNotif()
+    if Plr then
+        setclipboard(Plr.Name)
+        local FinalNotifString = tostring(
+            " Name: " .. tostring(Plr.Name) ..
+            " DName: " .. tostring(Plr.DisplayName) ..
+            " Health: " .. tostring(math.floor(Plr.Character:WaitForChild("Humanoid").Health)) ..
+            " Id: " .. tostring(Plr.UserId)
+        )
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Display: " .. tostring(Plr.Character.Humanoid.DisplayName),
+            Text = FinalNotifString,
+            Duration = 40
+        })
+    end
+end
+
+-- Функція для стрільби по цілі
+local function shootAtTarget()
+    if Plr and Plr.Character and Plr.Character:FindFirstChild("Head") then
+        local targetPosition = Plr.Character.Head.Position
+        local Parent_upvr = workspace[game.Players.LocalPlayer.Name]:FindFirstChildOfClass("Tool")
+        if Parent_upvr then
+            local ShootGun_upvr = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("ShootGun")
+            ShootGun_upvr:FireServer(targetPosition, Parent_upvr)
+        end
+    end
+end
+
+-- Функція для автоматичної стрільби
+local function startShooting()
+    shooting = true
+    while shooting do
+        shootAtTarget()
+        wait(interval) -- Інтервал 0.1 секунда
+    end
+end
+
+-- Обробка натискання кнопки для вибору цілі
+mouse.KeyDown:Connect(function(k)
+    if k == Settings.rewrittenmain.Key and Settings.rewrittenmain.Enabled then
+        if enabled then
+            enabled = false
+            if Settings.rewrittenmain.NOTIF then
+                game.StarterGui:SetCore("SendNotification", {
+                    Title = "Aim",
+                    Text = "Unlocked :)",
+                    Duration = 5
+                })
+            end
+        else
+            Plr = getClosestPlayerToCursor()
+            enabled = true
+            if Settings.rewrittenmain.NOTIF then
+                TargetNotif()
+            end
+        end
+    end
+end)
+
+-- Обробка натискання кнопки для стрільби
+mouse.KeyDown:Connect(function(k)
+    if k == Settings.rewrittenmain.ShootKey and enabled and not shooting then
+        startShooting()
+    end
+end)
+
+-- Обробка відпускання кнопки для стрільби
+mouse.KeyUp:Connect(function(k)
+    if k == Settings.rewrittenmain.ShootKey then
+        shooting = false
+    end
+end)
+
+-- Підсвічування цілі
+game:GetService("RunService").RenderStepped:Connect(function()
+    if enabled and Plr and Plr.Character and Plr.Character:FindFirstChild(SelectedPart) then
+        placemarker.CFrame = Plr.Character[SelectedPart].CFrame
+    else
+        placemarker.CFrame = CFrame.new(0, 9999, 0)
+    end
+end)

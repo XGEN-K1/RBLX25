@@ -1,5 +1,0 @@
-local ShootGun_upvr = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("ShootGun")
-local ReloadGun_upvr = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("ReloadGun")
-local Parent_upvr = workspace.Vinchezo6["Silenced Revolver"]
-ReloadGun_upvr:FireServer(Parent_upvr, "RevReload")
-
