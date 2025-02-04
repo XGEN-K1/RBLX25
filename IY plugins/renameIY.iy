@@ -1,0 +1,17 @@
+local Plugin = {
+    ["PluginName"] = "",
+    ["PluginDescription"] = "This is a helpful template",
+    ["Commands"] = {
+        ["renameIY"] = {
+            ["ListName"] = "renameIY [Text]",
+            ["Description"] = "renameIY [Text]",
+            ["Aliases"] = {""},
+            ["Function"] = function(args, speaker)
+                Text = getstring(1)
+                Title.Text = Text
+            end
+        }
+    }
+}
+
+return Plugin

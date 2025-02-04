@@ -1,0 +1,38 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RemoteEvent = ReplicatedStorage:WaitForChild("NetworkEvents"):WaitForChild("RemoteEvent")
+local Players = game:GetService("Players")
+local Tool = Instance.new("Tool")
+Tool.Name = "PlungerTool"
+Tool.RequiresHandle = false
+Tool.Parent = game.Players.LocalPlayer.Backpack
+
+local isFiring = false
+
+local function getMousePosition()
+    local player = Players.LocalPlayer
+    local mouse = player:GetMouse()
+    return Vector3.new(mouse.Hit.p.X, mouse.Hit.p.Y, mouse.Hit.p.Z)
+end
+
+local function firePlunger()
+    while isFiring do
+        local targetPos = getMousePosition()
+        local args = {
+            [1] = "FIRE_PLUNGER",
+            [2] = targetPos
+        }
+        RemoteEvent:FireServer(unpack(args))
+        wait(0.001)
+    end
+end
+
+Tool.Activated:Connect(function()
+    if not isFiring then
+        isFiring = true
+        firePlunger()
+    end
+end)
+
+Tool.Deactivated:Connect(function()
+    isFiring = false
+end)

@@ -1,0 +1,71 @@
+-- Створення ViewportFrame в GUI
+local player = game.Players.LocalPlayer
+local screenGui = Instance.new("ScreenGui", player.PlayerGui)
+local viewportFrame = Instance.new("ViewportFrame", screenGui)
+viewportFrame.Size = UDim2.new(0, 400, 0, 400)
+viewportFrame.Position = UDim2.new(0.5, -200, 0.5, -200)
+viewportFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+viewportFrame.BorderSizePixel = 0
+
+-- Створення камери для ViewportFrame
+local camera = Instance.new("Camera")
+viewportFrame.CurrentCamera = camera
+
+-- Таблиця для зберігання клонованих персонажів
+local clonedCharacters = {}
+
+-- Функція для оновлення камери
+local function updateCameraPosition()
+    local targetPosition = game.Workspace.CurrentCamera.CFrame.Position + Vector3.new(10, 5, 10)
+    local lookAtPosition = game.Workspace.CurrentCamera.CFrame.Position
+    camera.CFrame = CFrame.new(targetPosition, lookAtPosition)
+end
+
+-- Функція для додавання персонажа до ViewportFrame
+local function addPlayerToViewportFrame(player)
+    if not clonedCharacters[player] then
+        local character = player.Character
+        if character then
+            local characterClone = Instance.new("Model")
+            characterClone.Name = player.Name .. "_Clone"
+            characterClone.Parent = viewportFrame
+            
+            -- Клонування частин персонажа
+            for _, part in pairs(character:GetChildren()) do
+                if part:IsA("BasePart") then
+                    local clone = part:Clone()
+                    clone.Parent = characterClone
+                end
+            end
+
+            -- Зберігаємо клон в таблиці для подальшого оновлення
+            clonedCharacters[player] = characterClone
+        end
+    else
+        -- Якщо персонаж вже клонований, оновлюємо його позицію
+        local characterClone = clonedCharacters[player]
+        if characterClone then
+            local character = player.Character
+            if character then
+                for _, part in pairs(character:GetChildren()) do
+                    if part:IsA("BasePart") then
+                        local clonePart = characterClone:FindFirstChild(part.Name)
+                        if clonePart then
+                            clonePart.CFrame = part.CFrame
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+-- Оновлення відображення об'єктів і гравців
+game:GetService("RunService").Heartbeat:Connect(function()
+    updateCameraPosition()
+    
+    -- Додавання гравців до ViewportFrame
+    for _, otherPlayer in pairs(game.Players:GetPlayers()) do
+        addPlayerToViewportFrame(otherPlayer)
+    end
+end)

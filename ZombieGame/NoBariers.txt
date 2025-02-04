@@ -1,0 +1,21 @@
+local function removeObjects()
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("BasePart") and string.find(obj.Name, "ZombieDoor") then
+            obj:Destroy()
+        elseif obj:IsA("Folder") and obj.Name == "NoZombie" then
+            obj:Destroy()
+        end
+    end
+end
+
+-- Видаляти об'єкти постійно при їх появі
+workspace.DescendantAdded:Connect(function(obj)
+    if obj:IsA("BasePart") and string.find(obj.Name, "ZombieDoor") then
+        obj:Destroy()
+    elseif obj:IsA("Folder") and obj.Name == "NoZombie" then
+        obj:Destroy()
+    end
+end)
+
+-- Викликати при старті
+removeObjects()

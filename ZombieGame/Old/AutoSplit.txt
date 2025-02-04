@@ -1,0 +1,42 @@
+local Tool = Instance.new("Tool")
+Tool.Name = "AcidSpitter"
+Tool.RequiresHandle = false
+Tool.Parent = game.Players.LocalPlayer.Backpack
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RemoteEvent = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("ZombieRelated"):WaitForChild("AcidSpit")
+
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local isFiring = false
+
+local function getMousePosition()
+    local player = Players.LocalPlayer
+    local mouse = player:GetMouse()
+    return Vector3.new(mouse.Hit.p.X, mouse.Hit.p.Y, mouse.Hit.p.Z)
+end
+
+local function fireAcid()
+    while isFiring do
+        local targetPos = getMousePosition()
+        local adjustedPos = Vector3.new(targetPos.X, targetPos.Y + 0.1, targetPos.Z)
+        local args = {
+            [1] = adjustedPos,
+            [2] = targetPos
+        }
+        RemoteEvent:FireServer(unpack(args))
+        wait(0.01)
+    end
+end
+
+Tool.Activated:Connect(function()
+    if not isFiring then
+        isFiring = true
+        fireAcid()
+    end
+end)
+
+Tool.Deactivated:Connect(function()
+    isFiring = false
+end)

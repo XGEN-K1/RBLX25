@@ -1,0 +1,71 @@
+FREE_c9145a59b715ca2967836478735b95fe
+FREE_b23a015a2a085ca79f6ef43804ea976e
+
+реген щита
+game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("RegenPB"):FireServer()
+
+
+local args = {
+    [1] = "Jimmy",
+    [2] = true
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("EquipEmote"):FireServer(unpack(args))
+game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("StartEmote"):FireServer()
+
+local args = {
+    [1] = 3
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("SetStrength"):FireServer(unpack(args))
+
+local args = {
+    [1] = Vector3.new(628.8656005859375, -19.787487030029297, 610.1162719726562),
+    [2] = game:GetService("Players").LocalPlayer.Character.Spraycan,
+    [3] = "none"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("Spray"):FireServer(unpack(args))
+
+
+local args = {
+    [1] = Vector3.new(644.7630004882812, -19.787487030029297, 610.80078125),
+    [2] = game:GetService("Players").LocalPlayer.Character.Spraycan,
+    [3] = "Jimmy"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("Spray"):FireServer(unpack(args))
+
+
+local args = {
+    [1] = false
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("IsRunning"):FireServer(unpack(args))
+
+
+local args = {
+    [1] = game:GetService("Players").LocalPlayer,
+    [2] = true
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("Ragdoll"):FireServer(unpack(args))
+
+local args = {
+    [1] = game:GetService("Players").LocalPlayer,
+    [2] = false
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("Ragdoll"):FireServer(unpack(args))
+
+
+
+
+
+
+
+
+
+
+
+

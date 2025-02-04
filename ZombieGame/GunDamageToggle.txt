@@ -1,0 +1,62 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local RemoteEvent = ReplicatedStorage:WaitForChild("NetworkEvents"):WaitForChild("RemoteEvent")
+local LivingThings = workspace:WaitForChild("LivingThings")
+
+local player = Players.LocalPlayer
+local backpack = player:WaitForChild("Backpack")
+local character = player.Character or player.CharacterAdded:Wait()
+local mouse = player:GetMouse()
+
+local GunDmgTool = Instance.new("Tool")
+GunDmgTool.Name = "GunDmg(OFF)"
+GunDmgTool.RequiresHandle = false
+GunDmgTool.Parent = backpack
+
+local isActive = false
+local function updateToolName()
+    GunDmgTool.Name = isActive and "GunDmg(ON)" or "GunDmg(OFF)"
+end
+
+local function damagePlayers()
+    while isActive do
+        local equippedTool = character:FindFirstChildOfClass("Tool")
+        if equippedTool and equippedTool.Name == "Crossbow" then
+            for _, targetPlayer in pairs(Players:GetPlayers()) do
+                if targetPlayer.Character then
+                    local target = LivingThings:FindFirstChild(targetPlayer.Name)
+                    if target then
+                        local args = {
+                            [1] = "GUN_DAMAGE",
+                            [2] = target
+                        }
+                        RemoteEvent:FireServer(unpack(args))
+                    end
+                end
+            end
+        end
+        wait(0.1)
+    end
+end
+
+GunDmgTool.Activated:Connect(function()
+    isActive = not isActive
+    updateToolName()
+    if isActive then
+        damagePlayers()
+    end
+end)
+
+mouse.Button1Down:Connect(function()
+    if isActive then
+        local equippedTool = character:FindFirstChildOfClass("Tool")
+        if equippedTool and equippedTool.Name == "Crossbow" then
+            damagePlayers()
+        end
+    end
+end)
+
+player.CharacterAdded:Connect(function()
+    isActive = false
+    updateToolName()
+end)

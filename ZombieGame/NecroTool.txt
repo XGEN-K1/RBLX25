@@ -1,0 +1,39 @@
+local tool = Instance.new("Tool") 
+tool.Name = "Necro Ability" 
+tool.RequiresHandle = false 
+
+local player = game.Players.LocalPlayer 
+local character = player.Character or player.CharacterAdded:Wait() 
+local humanoid = character:FindFirstChildOfClass("Humanoid") 
+
+local equipped = false 
+
+local function activateAbility() 
+    if equipped then 
+        for i = 1, 300 do 
+            game.ReplicatedStorage.Remotes.ZombieRelated.Necro.AbilityPlayer:FireServer() 
+        end 
+    end 
+end 
+
+local function onEquipped() 
+    equipped = true 
+end 
+
+local function onUnequipped() 
+    equipped = false 
+end 
+
+local function onCharacterDied() 
+    equipped = false 
+end 
+
+tool.Activated:Connect(activateAbility) 
+tool.Equipped:Connect(onEquipped) 
+tool.Unequipped:Connect(onUnequipped) 
+
+if humanoid then 
+    humanoid.Died:Connect(onCharacterDied) 
+end 
+
+tool.Parent = player.Backpack 

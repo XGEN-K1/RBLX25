@@ -1,0 +1,6 @@
+local args = {
+    [1] = "GUN_DAMAGE",
+    [2] = workspace:WaitForChild("LivingThings"):WaitForChild("ewrsaaert")
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("NetworkEvents"):WaitForChild("RemoteEvent"):FireServer(unpack(args))

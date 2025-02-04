@@ -1,0 +1,5 @@
+for _, part in ipairs(workspace:GetDescendants()) do
+    if part:IsA("BasePart") and string.find(part.Name, "ZombieDoor") then
+        part:Destroy()
+    end
+end

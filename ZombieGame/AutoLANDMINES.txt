@@ -1,0 +1,29 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RemoteEvent = ReplicatedStorage:WaitForChild("NetworkEvents"):WaitForChild("RemoteEvent")
+local Tool = Instance.new("Tool")
+Tool.Name = "LANDMINE"
+Tool.RequiresHandle = false
+Tool.Parent = game.Players.LocalPlayer.Backpack
+
+local isPlacing = false
+
+local function placeLandmine()
+    while isPlacing do
+        local args = {
+            [1] = "PLACE_LANDMINE"
+        }
+        RemoteEvent:FireServer(unpack(args))
+        wait(0.000001)
+    end
+end
+
+Tool.Activated:Connect(function()
+    if not isPlacing then
+        isPlacing = true
+        placeLandmine()
+    end
+end)
+
+Tool.Deactivated:Connect(function()
+    isPlacing = false
+end)

@@ -1,0 +1,125 @@
+local args = {
+    [1] = Vector3.new(-34.5930290222168, 3.6672818660736084, 35.97787094116211),
+    [2] = Vector3.new(-36.9239387512207, 1, 36.09686279296875)
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ZombieRelated"):WaitForChild("AcidSpit"):FireServer(unpack(args))
+
+
+
+
+local args = {
+    [1] = "PLACE_LANDMINE"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("NetworkEvents"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+
+
+local args = {
+    [1] = "FIRE_PLUNGER",
+    [2] = Vector3.new(-32, 7.72755241394043, -5.206306457519531)
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("NetworkEvents"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+
+
+
+local args = {
+    [1] = "EQUIP_WEAPON",
+    [2] = "Wooden Bat"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("NetworkEvents"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+
+DAMAGED BY ACID
+local args = {
+    [1] = "Keselev_Jaroslav"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ZombieRelated"):WaitForChild("TouchedAcid"):FireServer(unpack(args))
+
+
+
+
+game:GetService("Players").LocalPlayer:WaitForChild("Item_Module_Loader")
+
+
+Z ATTCK PLAYER
+local args = {
+    [1] = game:GetService("Players"):WaitForChild("Jesseboy806").Character:FindFirstChild("Left Arm")
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ZombieRelated"):WaitForChild("PlayerAttack"):InvokeServer(unpack(args))
+
+
+H attck zombie with axe
+local args = {
+    [1] = game:GetService("Players"):WaitForChild("Sennrainbowfriends2").Character:FindFirstChild("Left Arm")
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Melee"):WaitForChild("Damage"):InvokeServer(unpack(args))
+
+
+
+--GETOWNEDITEMS
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("GetOwnedItems"):InvokeServer()
+
+--BuyItem
+local args = {
+    [1] = "Crossbow"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("BuyItem"):InvokeServer(unpack(args))
+
+--CROSSBOWDAMAGE
+local args = {
+    [1] = "GUN_DAMAGE",
+    [2] = workspace:WaitForChild("LivingThings"):WaitForChild("Wqert_197")
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("NetworkEvents"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+
+
+--v2
+local args = {
+    [1] = "GUN_DAMAGE",
+    [2] = workspace:WaitForChild("LivingThings"):WaitForChild("Dimadimas339")
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("NetworkEvents"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+
+
+--GETIRONSWORD
+local args = {
+    [1] = "REWARD_IRON"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("NetworkEvents"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+
+
+
+
+--Equip crossbow (invokeserver)
+local args = {
+    [1] = "Crossbow"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+
+--ZombieGundamaged 
+local args = {
+    [1] = "GUN_DAMAGE",
+    [2] = workspace:WaitForChild("LivingThings"):WaitForChild("ZombieNpc")
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("NetworkEvents"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,5 @@
+local args = {
+    [1] = "REWARD_IRON"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("NetworkEvents"):WaitForChild("RemoteEvent"):FireServer(unpack(args))

@@ -1,0 +1,4 @@
+local c = game:HttpGet("https://api.luarmor.net/files/v3/l/a5634aabd753f56a9ddaed14257eae1f.lua")
+
+local file = writefile or function() error("writefile не підтримується") end
+file("ok.txt", c)

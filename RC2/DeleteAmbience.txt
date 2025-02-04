@@ -1,0 +1,6 @@
+local player = game:GetService("Players").LocalPlayer
+local ambienceHandler = player:FindFirstChild("PlayerScripts") and player.PlayerScripts:FindFirstChild("AmbienceHandler")
+
+if ambienceHandler then
+    ambienceHandler:Destroy()
+end
