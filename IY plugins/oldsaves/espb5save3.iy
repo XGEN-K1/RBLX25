@@ -1,0 +1,327 @@
+--[[
+Пояснення до аргументів:
+
+    args[1] – Outline Transparency
+        Числове значення від 0 до 1.
+        0 – обводка повністю непрозора, 1 – повністю прозора.
+        За замовчуванням: 0.
+
+    args[2] – Depth Mode
+        1 означає AlwaysOnTop (за замовчуванням), 0 означає Occluded.
+
+    args[3] – Fill Transparency (для Highlight)
+        Числове значення від 0 до 1.
+        Якщо менше 1 – заповнення відображається (FillColor встановлюється у колір команди гравця).
+        За замовчуванням: 1 (без заповнення).
+
+    args[4] – Використання BillboardGui
+        1 – створювати BillboardGui (і відключати стандартне відображення ніків).
+        0 – не створювати BillboardGui; стандартне відображення ніків залишається активним, але Highlight завжди показується.
+        За замовчуванням: 1.
+
+    args[5] – Показ повідомлень
+        1 – показувати повідомлення (за замовчуванням).
+        0 – повідомлення не показуються.
+]]
+----------------------------------
+-- Глобальні змінні та конфігурація
+-------------------------------
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local Active = false
+local ScriptDisabled = false
+
+-- Конфігураційна таблиця (значення за замовчуванням)
+local config = {
+    outlineTransparency = 0,                           -- Прозорість обводки: 0 (непрозора) за замовчуванням
+    depthMode = Enum.HighlightDepthMode.AlwaysOnTop,     -- За замовчуванням: AlwaysOnTop
+    fillTransparency = 1,                              -- За замовчуванням: без заповнення (1 – повна прозорість)
+    useBillboard = 1,                                  -- За замовчуванням: створювати BillboardGui
+    showNotifications = 1                              -- За замовчуванням: показувати повідомлення
+}
+
+-------------------------------
+-- Функції повідомлень
+-------------------------------
+local function showNotification(message)
+    if config.showNotifications == 1 then
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "SS Script",
+            Text = message,
+            Duration = 2
+        })
+    end
+end
+
+-------------------------------
+-- Функції для стандартного відображення імен
+-------------------------------
+local function disableDisplayName(player)
+    local char = player.Character
+    if char then
+        local humanoid = char:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+        end
+    end
+end
+
+local function enableDisplayName(player)
+    local char = player.Character
+    if char then
+        local humanoid = char:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Viewer
+        end
+    end
+end
+
+-------------------------------
+-- Функції для створення та оновлення BillboardGui
+-------------------------------
+local function createBillboard(player)
+    local char = player.Character
+    if char and char:FindFirstChild("Head") then
+        local head = char.Head
+        if not head:FindFirstChild("PlayerMarker") then
+            local billboard = Instance.new("BillboardGui")
+            billboard.Name = "PlayerMarker"
+            billboard.Adornee = head
+            billboard.Size = UDim2.new(4, 0, 1.5, 0)
+            billboard.StudsOffset = Vector3.new(0, 2, 0)
+            billboard.AlwaysOnTop = true
+            billboard.Parent = head
+            
+            local frame = Instance.new("Frame")
+            frame.Size = UDim2.new(1, 0, 1, 0)
+            frame.BackgroundTransparency = 1
+            frame.Parent = billboard
+            
+            local displayNameLabel = Instance.new("TextLabel")
+            displayNameLabel.Size = UDim2.new(1, 0, 0.3, 0)
+            displayNameLabel.Position = UDim2.new(0, 0, 0, 0)
+            displayNameLabel.BackgroundTransparency = 1
+            displayNameLabel.Text = player.DisplayName
+            displayNameLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+            displayNameLabel.TextStrokeColor3 = Color3.new(1, 1, 1)
+            displayNameLabel.TextStrokeTransparency = 0
+            displayNameLabel.TextScaled = true
+            displayNameLabel.Font = Enum.Font.SourceSansBold
+            displayNameLabel.Parent = frame
+            
+            local usernameLabel = Instance.new("TextLabel")
+            usernameLabel.Size = UDim2.new(1, 0, 0.3, 0)
+            usernameLabel.Position = UDim2.new(0, 0, 0.21, 0)
+            usernameLabel.BackgroundTransparency = 1
+            usernameLabel.Text = "@" .. player.Name
+            usernameLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+            usernameLabel.TextStrokeColor3 = Color3.new(1, 1, 1)
+            usernameLabel.TextStrokeTransparency = 0.2
+            usernameLabel.TextScaled = true
+            usernameLabel.Font = Enum.Font.SourceSans
+            usernameLabel.Parent = frame
+            
+            local healthBarBackground = Instance.new("Frame")
+            healthBarBackground.Size = UDim2.new(0.8, 0, 0.15, 0)
+            healthBarBackground.Position = UDim2.new(0.1, 0, 0.51, 0)
+            healthBarBackground.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            healthBarBackground.BorderSizePixel = 0
+            healthBarBackground.Parent = frame
+            
+            local healthBar = Instance.new("Frame")
+            healthBar.Name = "HealthBar"
+            healthBar.Size = UDim2.new(1, 0, 1, 0)
+            healthBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+            healthBar.BorderSizePixel = 0
+            healthBar.Parent = healthBarBackground
+            
+            local healthLabel = Instance.new("TextLabel")
+            healthLabel.Name = "HealthLabel"
+            healthLabel.Size = UDim2.new(1, 0, 1, 0)
+            healthLabel.BackgroundTransparency = 1
+            healthLabel.TextScaled = true
+            healthLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+            healthLabel.TextStrokeColor3 = Color3.new(1, 1, 1)
+            healthLabel.TextStrokeTransparency = 0
+            healthLabel.Font = Enum.Font.SourceSansBold
+            healthLabel.Parent = healthBar
+        end
+    end
+end
+
+local function removeBillboard(player)
+    local char = player.Character
+    if char and char:FindFirstChild("Head") then
+        local marker = char.Head:FindFirstChild("PlayerMarker")
+        if marker then
+            marker:Destroy()
+        end
+    end
+end
+
+local function updateHealth(player)
+    local char = player.Character
+    if char and char:FindFirstChild("Humanoid") and char:FindFirstChild("Head") then
+        local humanoid = char.Humanoid
+        local head = char.Head
+        local billboard = head:FindFirstChild("PlayerMarker")
+        if billboard then
+            local frame = billboard:FindFirstChildOfClass("Frame")
+            if frame then
+                local healthBarBackground = frame:FindFirstChildOfClass("Frame")
+                if healthBarBackground then
+                    local healthBar = healthBarBackground:FindFirstChild("HealthBar")
+                    local healthLabel = healthBar and healthBar:FindFirstChild("HealthLabel")
+                    if healthBar and healthLabel then
+                        local healthRatio = humanoid.Health / humanoid.MaxHealth
+                        healthBar.Size = UDim2.new(healthRatio, 0, 1, 0)
+                        healthLabel.Text = math.floor(humanoid.Health) .. " / " .. math.floor(humanoid.MaxHealth)
+                        if healthRatio > 0.5 then
+                            healthBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+                        elseif healthRatio > 0.2 then
+                            healthBar.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
+                        else
+                            healthBar.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+-------------------------------
+-- Функції для створення та оновлення Highlight
+-------------------------------
+local function createOrUpdateHighlight(player)
+    local char = player.Character
+    if char then
+        local highlight = char:FindFirstChild("PlayerHighlight")
+        if not highlight then
+            highlight = Instance.new("Highlight")
+            highlight.Name = "PlayerHighlight"
+            highlight.Parent = char
+        end
+        highlight.OutlineTransparency = config.outlineTransparency
+        highlight.DepthMode = config.depthMode
+        highlight.FillTransparency = config.fillTransparency
+        highlight.OutlineColor = player.TeamColor.Color
+        if config.fillTransparency < 1 then
+            highlight.FillColor = player.TeamColor.Color
+        end
+    end
+end
+
+local function removeHighlight(player)
+    local char = player.Character
+    if char then
+        local highlight = char:FindFirstChild("PlayerHighlight")
+        if highlight then
+            highlight:Destroy()
+        end
+    end
+end
+
+-------------------------------
+-- Функція перевірки гравців (основний цикл)
+-------------------------------
+local function checkPlayers()
+    while Active do
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer then
+                local char = player.Character
+                if char and char:FindFirstChild("Head") then
+                    -- Якщо увімкнено BillboardGui (args[4] = 1)
+                    if config.useBillboard == 1 then
+                        if not char.Head:FindFirstChild("PlayerMarker") then
+                            createBillboard(player)
+                            disableDisplayName(player)
+                        end
+                        updateHealth(player)
+                    else
+                        -- Якщо BillboardGui не використовується – прибираємо його та вмикаємо стандартний показ ніку
+                        removeBillboard(player)
+                        enableDisplayName(player)
+                    end
+                    -- Незалежно від BillboardGui – завжди працює Highlight
+                    createOrUpdateHighlight(player)
+                end
+            end
+        end
+        wait(0.2)
+    end
+    -- Після зупинки ESP – очищення
+    for _, player in pairs(Players:GetPlayers()) do
+        removeBillboard(player)
+        removeHighlight(player)
+        enableDisplayName(player)
+    end
+end
+
+-------------------------------
+-- Глобальна функція для відключення ESP
+-------------------------------
+function disableespb5XGEN()
+    Active = false
+    ScriptDisabled = true
+    for _, player in pairs(Players:GetPlayers()) do
+        removeBillboard(player)
+        removeHighlight(player)
+        enableDisplayName(player)
+    end
+    showNotification("ESP Disabled")
+end
+
+-------------------------------
+-- Плагін
+-------------------------------
+local Plugin = {
+    ["PluginName"] = "",
+    ["PluginDescription"] = "billboard esp",
+    ["Commands"] = {
+        ["espb5"] = {
+            ["ListName"] = "espb5",
+            ["Description"] = "billboard esp",
+            ["Aliases"] = {},
+            ["Function"] = function(args, speaker)
+                disableespb5XGEN()
+                -- Налаштування з аргументів:
+                -- args[1] – Outline Transparency
+                config.outlineTransparency = args[1] and tonumber(args[1]) or 0
+                -- args[2] – Depth Mode: 0 = Occluded, 1 = AlwaysOnTop
+                if args[2] then
+                    if tonumber(args[2]) == 0 then
+                        config.depthMode = Enum.HighlightDepthMode.Occluded
+                    else
+                        config.depthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                    end
+                else
+                    config.depthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                end
+                -- args[3] – Fill Transparency (для Highlight)
+                config.fillTransparency = args[3] and tonumber(args[3]) or 1
+                -- args[4] – Використання BillboardGui: 1 = створювати, 0 = не створювати
+                config.useBillboard = args[4] and tonumber(args[4]) or 1
+                -- args[5] – Показ повідомлень: 1 = показувати, 0 = не показувати
+                config.showNotifications = args[5] and tonumber(args[5]) or 1
+
+                Active = true
+                ScriptDisabled = false
+                spawn(checkPlayers)
+                showNotification("ESP Enabled")
+            end
+        },
+        ["unespb5"] = {
+            ["ListName"] = "unespb5",
+            ["Description"] = "Disable billboard esp",
+            ["Aliases"] = {},
+            ["Function"] = function(args, speaker)
+                disableespb5XGEN()
+            end
+        }
+    }
+}
+
+return Plugin

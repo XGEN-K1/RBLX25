@@ -1,0 +1,24 @@
+local Plugin = {
+    ["PluginName"] = "ExamplePlugin",
+    ["PluginDescription"] = "This is a helpful template",
+    ["Commands"] = {
+        ["print"] = {
+            ["ListName"] = "print [text]",
+            ["Description"] = "Outputs text to the Roblox console",
+            ["Aliases"] = {"p","out","output"},
+            ["Function"] = function(args,speaker)
+              print(getstring(1))  
+            end
+        },
+        ["notify"] = {
+            ["ListName"] = "notify [text]",
+            ["Description"] = "uses the notification function",
+            ["Aliases"] = {'alert'},
+            ["Function"] = function(args,speaker)
+                notify('Notification Title',getstring(1))
+            end
+        }
+    }
+}
+
+return Plugin

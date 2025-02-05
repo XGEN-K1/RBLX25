@@ -1,0 +1,32 @@
+-- Місце для зберігання локального персонажа та інших змінних
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local mouse = player:GetMouse()
+local userInputService = game:GetService("UserInputService")
+
+-- Функція для виконання punch fling
+local function punchFling()
+    -- Створення вектору сили для "флінга"
+    local direction = (mouse.Hit.p - character.HumanoidRootPart.Position).unit
+    local force = Instance.new("BodyVelocity")
+    force.MaxForce = Vector3.new(10000, 10000, 10000) -- Максимальна сила
+    force.Velocity = direction * 100 -- Сила руху
+    force.Parent = character.HumanoidRootPart
+
+    -- Видалення BodyVelocity після короткого часу
+    game:GetService("Debris"):AddItem(force, 0.1)
+end
+
+-- Обробка натискання кнопки F
+userInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.F then
+        punchFling()
+    end
+end)
+
+-- Вимкнення скрипта, якщо персонаж помер або зареспавнився
+character:WaitForChild("Humanoid").Died:Connect(function()
+    character = player.Character or player.CharacterAdded:Wait() -- Оновлення персонажа після смерті
+    -- Після смерті персонажа, скрипт більше не працюватиме
+end)

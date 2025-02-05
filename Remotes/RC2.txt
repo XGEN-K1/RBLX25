@@ -1,0 +1,35 @@
+--Seller
+--1
+workspace:WaitForChild("Map"):WaitForChild("Structures"):WaitForChild("Nova_Sellary"):WaitForChild("TalkPart"):WaitForChild("Interact"):FireServer()
+--2
+local args = {
+    [1] = "Deal",
+    [2] = 1
+}
+
+workspace:WaitForChild("Map"):WaitForChild("Structures"):WaitForChild("Nova_Sellary"):WaitForChild("TalkPart"):WaitForChild("Interact"):FireServer(unpack(args))
+
+
+--BoxJob
+--1
+workspace:WaitForChild("Npcs"):WaitForChild("Zaurey"):WaitForChild("TalkPart"):WaitForChild("Interact"):FireServer()
+--2
+local args = {
+    [1] = "Yes",
+    [2] = 1
+}
+
+workspace:WaitForChild("Npcs"):WaitForChild("Zaurey"):WaitForChild("TalkPart"):WaitForChild("Interact"):FireServer(unpack(args))
+
+
+--interact atm
+workspace:WaitForChild("Map"):WaitForChild("Interactable"):WaitForChild("ATMS"):WaitForChild("ATM"):WaitForChild("Hitbox"):WaitForChild("Interact"):FireServer()
+
+--transfermoney
+local args = {
+    [1] = "PROSEKYTpl1",
+    [2] = 30
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("TransferMoney"):InvokeServer(unpack(args))
+
