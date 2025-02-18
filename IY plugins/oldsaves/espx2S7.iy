@@ -1,0 +1,731 @@
+--print("loaded espx v5")
+--[[
+tests
+espx 0 1 1 1 1 0 1 1 0.8 0 1 0 0 0 0 0 1 1 0 0 0       
+espx 1 0 1 1 1 1 1 0 0.3 1 1 0 1 1 1 1 0 0 1 1 0
+espx 0 1 1 1 1 1 1 1 0.3 1 1 0 1 1 0 1 2 0 0 1 0
+espx 0.2 1 1 1 1 0 1 1 0.8 1 1 0 0 0 0 1 1 0 0 0 0
+espx 0 1 1 1 1 0 1 0 0.4 1 1 0 1 1 1 0 2 1 0 1 0 0.6
+]]
+--[[
+Пояснення до аргументів:
+
+args[1] – Outline Transparency для Highlight:
+  Числове значення від 0 до 1 (0 – повністю непрозоре, 1 – повністю прозоре). За замовчуванням: 0.
+
+args[2] – Depth Mode для Highlight:
+  Якщо 1 – режим AlwaysOnTop (за замовчуванням); якщо 0 – режим Occluded.
+
+args[3] – Fill Transparency для Highlight:
+  Числове значення від 0 до 1. Якщо значення менше 1, то заповнення буде видно 
+  (FillColor встановлюється відповідно до кольору команди гравця). За замовчуванням: 1 (тобто заповнення відсутнє).
+
+args[4] – Використання BillboardGui:
+  Якщо 1 – створювати BillboardGui над гравцями (і вимикати стандартне відображення ніків);
+  Якщо 0 – BillboardGui не створюється, стандартне відображення ніків залишається, але Highlight все одно показується.
+  За замовчуванням: 1.
+
+args[5] – Billboard AlwaysOnTop (для створених цим скриптом BillboardGui):
+  Якщо 1 – BillboardGui буде показуватись поверх усього (через стіни тощо);
+  Якщо 0 – BillboardGui не буде показуватись поверх усього.
+  За замовчуванням: 1.
+
+args[6] – Показ повідомлень (Notifications):
+  Якщо 1 – повідомлення показуються;
+  Якщо 0 – повідомлення не показуються.
+  За замовчуванням: 0.
+
+args[7] – Підсвічування hitbox’ів:          
+  Якщо 1 – підсвічуються всі hitbox’и (ті, що входять до whitelist);
+  Якщо 0 – не підсвічуються.
+  За замовчуванням: 0.
+
+args[8] – Hitbox AlwaysOnTop:    
+  Якщо 1 – hitbox‑адорнменти будуть видні через стіни;
+  Якщо 0 – не будуть видні через стіни.
+  За замовчуванням: 1.
+
+args[9] – Прозорість підсвічування hitbox’ів:
+  Числове значення від 0 до 1, за замовчуванням: 0.3.
+
+args[10] – Використовувати кастомні кольори для hitbox’ів:
+  Якщо 1 – для кожної частини використовується встановлений у налаштуваннях колір;
+  Якщо 0 – використовується колір команди гравця.
+  За замовчуванням: 0.
+
+args[11] – Ефекти впливають на локального гравця:
+  Якщо 1 – ефекти застосовуються також до локального гравця;
+  Якщо 0 – ефекти НЕ застосовуються до локального.
+  За замовчуванням: 0.
+
+args[12] – Прозорість для всіх текстових елементів та healthbar створених BillboardGui (ESP):
+  Якщо задано – встановити для текстових елементів (TextTransparency, TextStrokeTransparency тощо)
+  та healthbar прозорість = args[12]. За замовчуванням: 0.
+  BackgroundTransparency текстових об’єктів залишається 1 (максимально прозорим).
+
+args[13] – Контроль інших BillboardGui (не створених цим скриптом):
+  Якщо 0 – вимикати всі BillboardGui на цільових персонажах, які не створені цим скриптом.
+  За замовчуванням: 1 (не вимикати).
+
+args[14] – Billboard AlwaysOnTop для інших BillboardGui цільових персонажів:
+  Якщо 1 – інші BillboardGui (не створені цим скриптом) цільових персонажів будуть показані поверх усього,
+       а також для них буде встановлено MaxDistance = 999999.
+  За замовчуванням: 0.
+
+args[15] – Прозорість для інших текстових елементів та healthbar в BillboardGui (не створених цим скриптом):
+  Якщо задано – встановити для текстових елементів (TextTransparency, TextStrokeTransparency тощо)
+  прозорість = args[15]. За замовчуванням: 0.
+  BackgroundTransparency не змінюється.
+
+--- Нові аргументи для трейсерів та інших ефектів ---
+
+args[16] – Трейсери (Tracers):
+  Якщо 1 – трейсери до цільових гравців увімкнені;
+  Якщо 0 – вимкнені.
+  За замовчуванням: 0.
+
+args[17] – Трейсери поверх стін (Through Walls):
+  Якщо 1 – трейсери видно поверх усього (через стіни);
+  Якщо 0 – через стіни їх не видно (за допомогою raycast-перевірки).
+  За замовчуванням: 0.
+
+args[18] – Початкова точка трейсера:
+  1 = трейсер малюється від HumanoidRootPart локального гравця;
+  0 = від курсора миші;
+  2 = від нижньої частини екрану по середині.
+  За замовчуванням: 1.
+
+args[19] – Фіксований розмір BillboardGui:
+  Якщо 1 – розмір BillboardGui не буде змінюватись при віддаленні;
+  Якщо 0 – розмір буде змінюватись (як за замовчуванням).
+  За замовчуванням: 0.
+
+args[20] – Модель цільових гравців поверх усього:         (не працює)
+  Якщо 1 – цільові персонажі (моделі R6/R15) видно поверх усього (через стіни);
+  Якщо 0 – стандартне відображення.
+  За замовчуванням: 0.
+
+args[21] – Трейсери тільки якщо ціль у зоні видимості камери: (не працює)
+  Якщо 1 – трейсер малюється тільки якщо цільовий гравець знаходиться у полі зору (on screen);
+  Якщо 0 – трейсер малюється навіть якщо гравець поза екраном.
+  За замовчуванням: 0.
+]]
+-------------------------------
+-- Глобальні змінні та конфігурація
+-------------------------------
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+local camera = Workspace.CurrentCamera
+
+local Active = false
+local ScriptDisabled = false
+
+-- Таблиця кастомних кольорів для hitbox’ів (за бажанням змінити)
+local customColors = {
+    Head = Color3.fromRGB(255, 255, 255),
+    Torso = Color3.fromRGB(255, 0, 0),
+    UpperTorso = Color3.fromRGB(255, 0, 0),
+    LowerTorso = Color3.fromRGB(255, 0, 0),
+    ["Left Arm"] = Color3.fromRGB(0, 255, 0),
+    ["Right Arm"] = Color3.fromRGB(0, 255, 0),
+    ["Left Leg"] = Color3.fromRGB(0, 0, 255),
+    ["Right Leg"] = Color3.fromRGB(0, 0, 255),
+    HumanoidRootPart = Color3.fromRGB(255, 255, 0),
+    LeftUpperArm = Color3.fromRGB(0, 255, 0),
+    LeftLowerArm = Color3.fromRGB(0, 255, 0),
+    RightUpperArm = Color3.fromRGB(0, 255, 0),
+    RightLowerArm = Color3.fromRGB(0, 255, 0),
+    LeftUpperLeg = Color3.fromRGB(0, 0, 255),
+    LeftLowerLeg = Color3.fromRGB(0, 0, 255),
+    RightUpperLeg = Color3.fromRGB(0, 0, 255),
+    RightLowerLeg = Color3.fromRGB(0, 0, 255)
+}
+
+-- Конфігураційна таблиця (значення за замовчуванням)
+local config = {
+    outlineTransparency = 0,                           -- args[1]
+    depthMode = Enum.HighlightDepthMode.AlwaysOnTop,     -- args[2] (за замовчуванням AlwaysOnTop)
+    fillTransparency = 1,                              -- args[3]
+    useBillboard = 1,                                  -- args[4]
+    billboardAlwaysOnTop = 1,                          -- args[5]
+    showNotifications = 0,                             -- args[6]
+    hitboxHighlight = 0,                               -- args[7]
+    hitboxAlwaysOnTop = 1,                             -- args[8]
+    hitboxTransparency = 0.3,                          -- args[9]
+    useCustomHitboxColors = 0,                         -- args[10]
+    affectLocal = 0,                                   -- args[11]
+    billboardTransparency = 0,                         -- args[12]
+    disableOtherBillboards = false,                    -- args[13] (0 – вимкнути інші BillboardGui)
+    otherBillboardAlwaysOnTop = 0,                     -- args[14]
+    otherBillboardTransparency = 0,                    -- args[15]
+    -- Нові аргументи:
+    tracersEnabled = 0,                                -- args[16]
+    tracerThroughWalls = 0,                            -- args[17]
+    tracerStartMode = 1,                               -- args[18]
+    billboardScalingFixed = 0,                         -- args[19]
+    modelsAlwaysOnTop = 0,                             -- args[20]
+    tracerVisibleOnlyWhenOnScreen = 0                  -- args[21]
+}
+
+-- Список імен частин для підсвічування (whitelist)
+local hitboxWhitelist = {
+    ["Head"] = true,
+    ["Torso"] = true,
+    ["UpperTorso"] = true,
+    ["LowerTorso"] = true,
+    ["Left Arm"] = true,
+    ["Right Arm"] = true,
+    ["Left Leg"] = true,
+    ["Right Leg"] = true,
+    ["HumanoidRootPart"] = true,
+    ["LeftUpperArm"] = true,
+    ["LeftLowerArm"] = true,
+    ["RightUpperArm"] = true,
+    ["RightLowerArm"] = true,
+    ["LeftUpperLeg"] = true,
+    ["LeftLowerLeg"] = true,
+    ["RightUpperLeg"] = true,
+    ["RightLowerLeg"] = true
+}
+
+-------------------------------
+-- Функція для отримання контрастного кольору для обводки тексту
+-------------------------------
+local function getStrokeColor(color)
+    local brightness = (color.R + color.G + color.B) / 3
+    -- Якщо колір світлий, повертаємо чорний, інакше – білий
+    if brightness > 0.5 then
+        return Color3.new(0, 0, 0)
+    else
+        return Color3.new(1, 1, 1)
+    end
+end
+
+-------------------------------
+-- Функції повідомлень
+-------------------------------
+local function showNotification(message)
+    if config.showNotifications == 1 then
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "SS Script",
+            Text = message,
+            Duration = 2
+        })
+    end
+end
+
+-------------------------------
+-- Функції для стандартного відображення імен
+-------------------------------
+local function disableDisplayName(player)
+    local char = player.Character
+    if char then
+        local humanoid = char:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+        end
+    end
+end
+
+local function enableDisplayName(player)
+    local char = player.Character
+    if char then
+        local humanoid = char:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Viewer
+        end
+    end
+end
+
+-------------------------------
+-- Функції для створення та оновлення BillboardGui, створених цим скриптом
+-------------------------------
+local function createBillboard(player)
+    local char = player.Character
+    if char and char:FindFirstChild("Head") then
+        local head = char.Head
+        if not head:FindFirstChild("PlayerMarker") then
+            local billboard = Instance.new("BillboardGui")
+            billboard.Name = "PlayerMarker"
+            billboard.Adornee = head
+            -- За замовчуванням використовується розмір, який змінюється з відстанню
+            billboard.Size = UDim2.new(4, 0, 1.5, 0)
+            billboard.StudsOffset = Vector3.new(0, 2, 0)
+            billboard.AlwaysOnTop = (config.billboardAlwaysOnTop == 1)
+            billboard.Parent = head
+            
+            local frame = Instance.new("Frame")
+            frame.Size = UDim2.new(1, 0, 1, 0)
+            frame.BackgroundTransparency = 1 -- фон фрейму залишається максимально прозорим
+            frame.Parent = billboard
+            
+            local displayNameLabel = Instance.new("TextLabel")
+            displayNameLabel.Size = UDim2.new(1, 0, 0.3, 0)
+            displayNameLabel.Position = UDim2.new(0, 0, 0, 0)
+            displayNameLabel.BackgroundTransparency = 1
+            displayNameLabel.Text = player.DisplayName
+            displayNameLabel.TextColor3 = player.TeamColor.Color
+            displayNameLabel.TextStrokeColor3 = getStrokeColor(player.TeamColor.Color)
+            displayNameLabel.TextTransparency = config.billboardTransparency
+            displayNameLabel.TextStrokeTransparency = config.billboardTransparency
+            displayNameLabel.TextScaled = true
+            displayNameLabel.Font = Enum.Font.SourceSansBold
+            displayNameLabel.Parent = frame
+            
+            local usernameLabel = Instance.new("TextLabel")
+            usernameLabel.Size = UDim2.new(1, 0, 0.3, 0)
+            usernameLabel.Position = UDim2.new(0, 0, 0.21, 0)
+            usernameLabel.BackgroundTransparency = 1
+            usernameLabel.Text = "@" .. player.Name
+            usernameLabel.TextColor3 = player.TeamColor.Color
+            usernameLabel.TextStrokeColor3 = getStrokeColor(player.TeamColor.Color)
+            usernameLabel.TextTransparency = config.billboardTransparency
+            usernameLabel.TextStrokeTransparency = config.billboardTransparency
+            usernameLabel.TextScaled = true
+            usernameLabel.Font = Enum.Font.SourceSans
+            usernameLabel.Parent = frame
+            
+            local healthBarBackground = Instance.new("Frame")
+            healthBarBackground.Size = UDim2.new(0.8, 0, 0.15, 0)
+            healthBarBackground.Position = UDim2.new(0.1, 0, 0.51, 0)
+            healthBarBackground.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            healthBarBackground.BorderSizePixel = 0
+            healthBarBackground.BackgroundTransparency = 1
+            healthBarBackground.Parent = frame
+            
+            local healthBar = Instance.new("Frame")
+            healthBar.Name = "HealthBar"
+            healthBar.Size = UDim2.new(1, 0, 1, 0)
+            healthBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+            healthBar.BorderSizePixel = 0
+            healthBar.BackgroundTransparency = config.billboardTransparency
+            healthBar.Parent = healthBarBackground
+            
+            local healthLabel = Instance.new("TextLabel")
+            healthLabel.Name = "HealthLabel"
+            healthLabel.Size = UDim2.new(1, 0, 1, 0)
+            healthLabel.BackgroundTransparency = 1
+            healthLabel.TextScaled = true
+            healthLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+            healthLabel.TextStrokeColor3 = Color3.new(1, 1, 1)
+            healthLabel.TextTransparency = config.billboardTransparency
+            healthLabel.TextStrokeTransparency = config.billboardTransparency
+            healthLabel.Font = Enum.Font.SourceSansBold
+            healthLabel.Parent = healthBar
+        end
+    end
+end
+
+local function removeBillboard(player)
+    local char = player.Character
+    if char and char:FindFirstChild("Head") then
+        local marker = char.Head:FindFirstChild("PlayerMarker")
+        if marker then
+            marker:Destroy()
+        end
+    end
+end
+
+local function updateHealth(player)
+    local char = player.Character
+    if char and char:FindFirstChild("Humanoid") and char:FindFirstChild("Head") then
+        local humanoid = char.Humanoid
+        local head = char.Head
+        local billboard = head:FindFirstChild("PlayerMarker")
+        if billboard then
+            local frame = billboard:FindFirstChildOfClass("Frame")
+            if frame then
+                local healthBarBackground = frame:FindFirstChildOfClass("Frame")
+                if healthBarBackground then
+                    local healthBar = healthBarBackground:FindFirstChild("HealthBar")
+                    local healthLabel = healthBar and healthBar:FindFirstChild("HealthLabel")
+                    if healthBar and healthLabel then
+                        local healthRatio = humanoid.Health / humanoid.MaxHealth
+                        healthBar.Size = UDim2.new(healthRatio, 0, 1, 0)
+                        healthLabel.Text = math.floor(humanoid.Health) .. " / " .. math.floor(humanoid.MaxHealth)
+                        if healthRatio > 0.5 then
+                            healthBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+                        elseif healthRatio > 0.2 then
+                            healthBar.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
+                        else
+                            healthBar.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+-- Функція для коригування розміру BillboardGui згідно з args[19]
+local function updateBillboardScaling(player)
+    local char = player.Character
+    if char and char:FindFirstChild("Head") then
+        local marker = char.Head:FindFirstChild("PlayerMarker")
+        if marker then
+            if config.billboardScalingFixed == 1 then
+                -- Фіксований розмір (в пікселях)
+                marker.Size = UDim2.fromOffset(200, 50)
+            else
+                -- Стандартний розмір (як задано при створенні)
+                marker.Size = UDim2.new(4, 0, 1.5, 0)
+            end
+        end
+    end
+end
+
+-------------------------------
+-- Функції для створення та оновлення Highlight
+-------------------------------
+local function createOrUpdateHighlight(player)
+    local char = player.Character
+    if char then
+        local highlight = char:FindFirstChild("PlayerHighlight")
+        if not highlight then
+            highlight = Instance.new("Highlight")
+            highlight.Name = "PlayerHighlight"
+            highlight.Parent = char
+        end
+        highlight.OutlineTransparency = config.outlineTransparency
+        -- Якщо modelsAlwaysOnTop увімкнено, примусово робимо AlwaysOnTop
+        if config.modelsAlwaysOnTop == 1 then
+            highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+        else
+            highlight.DepthMode = config.depthMode
+        end
+        highlight.FillTransparency = config.fillTransparency
+        highlight.OutlineColor = player.TeamColor.Color
+        if config.fillTransparency < 1 then
+            highlight.FillColor = player.TeamColor.Color
+        end
+    end
+end
+
+local function removeHighlight(player)
+    local char = player.Character
+    if char then
+        local highlight = char:FindFirstChild("PlayerHighlight")
+        if highlight then
+            highlight:Destroy()
+        end
+    end
+end
+
+-------------------------------
+-- Функції для підсвічування hitbox’ів за допомогою BoxHandleAdornment
+-------------------------------
+local function updateHitboxHighlight(player)
+    local char = player.Character
+    if char then
+        for _, part in pairs(char:GetDescendants()) do
+            if part:IsA("BasePart") and hitboxWhitelist[part.Name] then
+                local adorn = part:FindFirstChild("HitboxHighlight")
+                if not adorn then
+                    adorn = Instance.new("BoxHandleAdornment")
+                    adorn.Name = "HitboxHighlight"
+                    adorn.Adornee = part
+                    adorn.Parent = part
+                end
+                adorn.AlwaysOnTop = (config.hitboxAlwaysOnTop == 1)
+                adorn.ZIndex = 10
+                adorn.Size = part.Size + Vector3.new(0.001, 0.001, 0.001)
+                adorn.Transparency = config.hitboxTransparency
+                if config.useCustomHitboxColors == 1 then
+                    local c = customColors[part.Name]
+                    adorn.Color3 = c or player.TeamColor.Color
+                else
+                    adorn.Color3 = player.TeamColor.Color
+                end
+            end
+        end
+    end
+end
+
+local function removeHitboxHighlights(player)
+    local char = player.Character
+    if char then
+        for _, part in pairs(char:GetDescendants()) do
+            if part:IsA("BasePart") then
+                local adorn = part:FindFirstChild("HitboxHighlight")
+                if adorn then
+                    adorn:Destroy()
+                end
+            end
+        end
+    end
+end
+
+-------------------------------
+-- Функції для оновлення інших BillboardGui (не створених цим скриптом)
+-- Застосовуються лише до цільових персонажів
+-------------------------------
+local function updateOtherBillboards(player)
+    local char = player.Character
+    if char then
+        for _, v in pairs(char:GetDescendants()) do
+            if v:IsA("BillboardGui") and v.Name ~= "PlayerMarker" then
+                -- Якщо args[13] == 0, вимикаємо інші BillboardGui
+                v.Enabled = not config.disableOtherBillboards
+                -- args[14]: якщо 1, встановлюємо AlwaysOnTop та MaxDistance, інакше залишаємо як є
+                if config.otherBillboardAlwaysOnTop == 1 then
+                    v.AlwaysOnTop = true
+                    v.MaxDistance = 999999
+                end
+                -- Проходимось по всіх елементах GUI всередині BillboardGui
+                for _, descendant in ipairs(v:GetDescendants()) do
+                    if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
+                        descendant.TextTransparency = config.otherBillboardTransparency
+                        descendant.TextStrokeTransparency = config.otherBillboardTransparency
+                        -- BackgroundTransparency залишається незмінним
+                    end
+                end
+            end
+        end
+    end
+end
+
+local function restoreOtherBillboards(player)
+    local char = player.Character
+    if char then
+        for _, v in pairs(char:GetDescendants()) do
+            if v:IsA("BillboardGui") and v.Name ~= "PlayerMarker" then
+                v.Enabled = true
+            end
+        end
+    end
+end
+
+-------------------------------
+-- Трейсери (Tracers)
+-------------------------------
+-- Таблиця для збереження об’єктів Drawing.Line для кожного гравця
+local tracers = {}
+local tracerConnection
+
+-- Функція для оновлення трейсерів кожного кадру
+local function startTracerLoop()
+    -- Якщо з'єднання вже існує, розірвати його
+    if tracerConnection then tracerConnection:Disconnect() end
+    tracerConnection = RunService.RenderStepped:Connect(function()
+        for _, player in pairs(Players:GetPlayers()) do
+            if player == LocalPlayer then
+                -- Пропускаємо локального гравця
+                continue
+            end
+            local char = player.Character
+            if char and char:FindFirstChild("Humanoid") and char:FindFirstChild("HumanoidRootPart") and (char.Humanoid.Health > 0) then
+                local hrp = char.HumanoidRootPart
+                local targetScreenPos, onScreen = camera:WorldToViewportPoint(hrp.Position)
+                local targetPos2D = Vector2.new(targetScreenPos.X, targetScreenPos.Y)
+                
+                -- Визначення стартової точки трейсера згідно з config.tracerStartMode
+                local startPos = nil
+                if config.tracerStartMode == 1 then
+                    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                        local lpPos = camera:WorldToViewportPoint(LocalPlayer.Character.HumanoidRootPart.Position)
+                        startPos = Vector2.new(lpPos.X, lpPos.Y)
+                    else
+                        startPos = Vector2.new(camera.ViewportSize.X/2, camera.ViewportSize.Y)
+                    end
+                elseif config.tracerStartMode == 0 then
+                    local mouse = LocalPlayer:GetMouse()
+                    startPos = Vector2.new(mouse.X, mouse.Y)
+                elseif config.tracerStartMode == 2 then
+                    startPos = Vector2.new(camera.ViewportSize.X/2, camera.ViewportSize.Y)
+                end
+                
+                -- Перевірка raycast-ом, якщо трейсери через стіни вимкнені (args[17] == 0)
+                local visibleByRay = true
+                if config.tracerThroughWalls == 0 then
+                    local rayOrigin = camera.CFrame.Position
+                    local rayDirection = (hrp.Position - rayOrigin)
+                    local raycastParams = RaycastParams.new()
+                    raycastParams.FilterDescendantsInstances = {LocalPlayer.Character}
+                    raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+                    local rayResult = Workspace:Raycast(rayOrigin, rayDirection, raycastParams)
+                    if rayResult and not rayResult.Instance:IsDescendantOf(char) then
+                        visibleByRay = false
+                    end
+                end
+                
+                -- Отримання або створення Drawing.Line для даного гравця
+                local tracer = tracers[player]
+                if not tracer then
+                    tracer = Drawing.new("Line")
+                    tracer.Thickness = 2
+                    tracer.Color = player.TeamColor.Color
+                    tracer.Visible = false
+                    tracers[player] = tracer
+                else
+                    tracer.Color = player.TeamColor.Color
+                end
+                
+                -- Визначення видимості трейсера:
+                -- Якщо config.tracerVisibleOnlyWhenOnScreen == 1, то показувати лише якщо target on screen
+                if config.tracerVisibleOnlyWhenOnScreen == 1 and (not onScreen) then
+                    tracer.Visible = false
+                else
+                    tracer.Visible = onScreen and visibleByRay
+                end
+                
+                tracer.From = startPos
+                tracer.To = targetPos2D
+            else
+                -- Якщо у гравця немає валідного персонажа – ховаємо трейсер, якщо він існує
+                if tracers[player] then
+                    tracers[player].Visible = false
+                end
+            end
+        end
+    end)
+end
+
+-- При видаленні гравця – прибираємо його трейсер
+Players.PlayerRemoving:Connect(function(player)
+    if tracers[player] then
+        tracers[player]:Remove()
+        tracers[player] = nil
+    end
+end)
+
+-------------------------------
+-- Функції для перевірки гравців (основний цикл)
+-------------------------------
+local function checkPlayers()
+    while Active do
+        for _, player in pairs(Players:GetPlayers()) do
+            if player == LocalPlayer and config.affectLocal == 0 then
+                continue
+            end
+            local char = player.Character
+            if char and char:FindFirstChild("Head") then
+                if config.useBillboard == 1 then
+                    if not char.Head:FindFirstChild("PlayerMarker") then
+                        createBillboard(player)
+                        disableDisplayName(player)
+                    end
+                    updateHealth(player)
+                    updateBillboardScaling(player)
+                else
+                    removeBillboard(player)
+                    enableDisplayName(player)
+                end
+                createOrUpdateHighlight(player)
+                if config.hitboxHighlight == 1 then
+                    updateHitboxHighlight(player)
+                else
+                    removeHitboxHighlights(player)
+                end
+                updateOtherBillboards(player)
+            end
+        end
+        wait(0.2)
+    end
+    for _, player in pairs(Players:GetPlayers()) do
+        removeBillboard(player)
+        removeHighlight(player)
+        removeHitboxHighlights(player)
+        restoreOtherBillboards(player)
+        enableDisplayName(player)
+    end
+end
+
+-------------------------------
+-- Глобальна функція для відключення ESP
+-------------------------------
+function disableespb5XGEN(silent)
+    Active = false
+    ScriptDisabled = true
+    for _, player in pairs(Players:GetPlayers()) do
+        removeBillboard(player)
+        removeHighlight(player)
+        removeHitboxHighlights(player)
+        restoreOtherBillboards(player)
+        enableDisplayName(player)
+    end
+    -- Вимикаємо трейсер, якщо був увімкнений
+    if tracerConnection then
+        tracerConnection:Disconnect()
+        tracerConnection = nil
+    end
+    -- Прибираємо усі трейсер Drawing
+    for player, tracer in pairs(tracers) do
+        tracer:Remove()
+        tracers[player] = nil
+    end
+    if not silent then
+        showNotification("ESP Disabled")
+    end
+end
+
+-------------------------------
+-- Плагін
+-------------------------------
+local Plugin = {
+    ["PluginName"] = "",
+    ["PluginDescription"] = "billboard esp",
+    ["Commands"] = {
+        ["espx"] = {
+            ["ListName"] = "espb5",
+            ["Description"] = "billboard esp",
+            ["Aliases"] = {},
+            ["Function"] = function(args, speaker)
+                disableespb5XGEN(true)  -- Попереднє відключення без повідомлення
+
+                config.outlineTransparency = args[1] and tonumber(args[1]) or 0
+                if args[2] then
+                    if tonumber(args[2]) == 0 then
+                        config.depthMode = Enum.HighlightDepthMode.Occluded
+                    else
+                        config.depthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                    end
+                else
+                    config.depthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                end
+                config.fillTransparency = args[3] and tonumber(args[3]) or 1
+                config.useBillboard = args[4] and tonumber(args[4]) or 1
+                config.billboardAlwaysOnTop = args[5] and tonumber(args[5]) or 1
+                config.showNotifications = args[6] and tonumber(args[6]) or 0
+                config.hitboxHighlight = args[7] and tonumber(args[7]) or 0
+                config.hitboxAlwaysOnTop = args[8] and tonumber(args[8]) or 1
+                config.hitboxTransparency = args[9] and tonumber(args[9]) or 0.3
+                config.useCustomHitboxColors = args[10] and tonumber(args[10]) or 0
+                config.affectLocal = args[11] and tonumber(args[11]) or 0
+
+                config.billboardTransparency = args[12] and tonumber(args[12]) or 0
+                config.disableOtherBillboards = (args[13] and tonumber(args[13]) == 0) and true or false
+                config.otherBillboardAlwaysOnTop = args[14] and tonumber(args[14]) or 0
+                config.otherBillboardTransparency = args[15] and tonumber(args[15]) or 0
+
+                -- Нові параметри:
+                config.tracersEnabled = args[16] and tonumber(args[16]) or 0
+                config.tracerThroughWalls = args[17] and tonumber(args[17]) or 0
+                config.tracerStartMode = args[18] and tonumber(args[18]) or 1
+                config.billboardScalingFixed = args[19] and tonumber(args[19]) or 0
+                config.modelsAlwaysOnTop = args[20] and tonumber(args[20]) or 0
+                config.tracerVisibleOnlyWhenOnScreen = args[21] and tonumber(args[21]) or 0
+
+                Active = true
+                ScriptDisabled = false
+                spawn(checkPlayers)
+                -- Якщо трейсери увімкнені, запускаємо цикл їх оновлення
+                if config.tracersEnabled == 1 then
+                    startTracerLoop()
+                end
+                showNotification("ESP Enabled")
+            end
+        },
+        ["unespx"] = {
+            ["ListName"] = "unespx",
+            ["Description"] = "Disable billboard esp",
+            ["Aliases"] = {},
+            ["Function"] = function(args, speaker)
+                disableespb5XGEN()
+            end
+        }
+    }
+}
+
+return Plugin

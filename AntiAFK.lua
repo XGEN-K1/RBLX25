@@ -19,10 +19,10 @@ while getgenv().afk do
         virtualInputManager:SendMouseButtonEvent(1, 1, Enum.UserInputType.MouseButton2.Value, true, game, 1)
         virtualInputManager:SendMouseButtonEvent(1, 1, Enum.UserInputType.MouseButton2.Value, false, game, 1)
         --print("click")
-        wait(5)
+        wait(300)
     else
         print("Temporarily disabling anti-afk as the user is holding the right mouse button.")
-        wait(5)
+        wait(600)
     end
 end
 
