@@ -104,9 +104,6 @@ local animations = {
 	["annyeong"] = 9527883498,
 	["gashina"] = 9527886709,
 	["hwaiting"] = 9527885267,
-    --XGEN
-    ["TWICE Like Ooh-Ahh"] = 14123781004,
-    ["V Pose - Tommy Hilfiger"] = 10214319518,
 --  [""] = 0,
 }
 
@@ -120,70 +117,34 @@ local animations = {
             end
         },
 ]]
-
-local currentEmoteTrack = nil
-local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
-local rootPart = character:WaitForChild("HumanoidRootPart")
-
-local function stopEmote()
-	if currentEmoteTrack then
-		currentEmoteTrack:Stop()
-		currentEmoteTrack = nil
-		character.Animate.Disabled = false
-	end
-end
-
-humanoid.StateChanged:Connect(function(oldState, newState)
-	if newState == Enum.HumanoidStateType.Freefall or newState == Enum.HumanoidStateType.Jumping then
-		task.spawn(function()
-			task.wait(0.2)
-			if humanoid:GetState() == newState and math.abs(rootPart.Velocity.Y) > 10 then
-				stopEmote()
-			end
-		end)
-	end
-end)
-
-humanoid.Running:Connect(function(speed)
-	if speed > 1 then
-		stopEmote()
-	end
-end)
-
 function PlayAnim(id)
-	character.Animate.Disabled = false
-	local animtracks = humanoid:GetPlayingAnimationTracks()
-	for _, track in pairs(animtracks) do
-		track:Stop()
-	end
-	character.Animate.Disabled = true
-	local anim = Instance.new("Animation")
-	anim.AnimationId = "rbxassetid://" .. id
-	local loadanim = humanoid:LoadAnimation(anim)
-	currentEmoteTrack = loadanim
-	loadanim:Play()
-	loadanim:AdjustSpeed(1)
-	loadanim.Stopped:Connect(function()
-		currentEmoteTrack = nil
-		character.Animate.Disabled = false
-		local currentTracks = humanoid:GetPlayingAnimationTracks()
-		for _, track in pairs(currentTracks) do
-			track:Stop()
-		end
-	end)
+	game.Players.LocalPlayer.Character.Animate.Disabled = false
+    local animtrack = game.Players.LocalPlayer.Character.Humanoid:GetPlayingAnimationTracks()
+    for i, track in pairs (animtrack) do
+        track:Stop()
+    end
+    local plr = game.Players.LocalPlayer
+    local hum = plr.Character.Humanoid
+    plr.Character.Animate.Disabled = true
+    local Anim = Instance.new("Animation")
+    Anim.AnimationId = "rbxassetid://"..id
+    local loadanim = hum:LoadAnimation(Anim)
+    loadanim:Play()
+    loadanim:AdjustSpeed(1)
+    loadanim.Stopped:Connect(function()
+    plr.Character.Animate.Disabled = false
+	for i, track in pairs (animtrack) do
+        track:Stop()
+    end
+    end)
 end
-
 function StopAnims()
-	character.Animate.Disabled = false
-	local animtracks = humanoid:GetPlayingAnimationTracks()
-	for _, track in pairs(animtracks) do
-		track:Stop()
-	end
-	stopEmote()
+    game.Players.LocalPlayer.Character.Animate.Disabled = false
+    local animtrack = game.Players.LocalPlayer.Character.Humanoid:GetPlayingAnimationTracks()
+    for i, track in pairs (animtrack) do
+        track:Stop()
+    end
 end
-
 
 local Plugin = {
     ["PluginName"] = "R15 EMOTES",
@@ -1013,26 +974,6 @@ local Plugin = {
                 PlayAnim(animations["lasso turn"])              
             end
         },
-
-        
-        ["e_twloh"] = {
-            ["ListName"] = "e_twloh",
-            ["Description"] = "",
-            ["Aliases"] = {},
-            ["Function"] = function(args, speaker)
-                PlayAnim(animations["TWICE Like Ooh-Ahh"])    
-            end
-        },
-        ["e_vpose"] = {
-            ["ListName"] = "e_vpose",
-            ["Description"] = "",
-            ["Aliases"] = {},
-            ["Function"] = function(args, speaker)
-                PlayAnim(animations["V Pose - Tommy Hilfiger"])              
-            end
-        },
-
-
         ["e_stopanim"] = {
             ["ListName"] = "e_stopanim / noemotes / stopemotes",
             ["Description"] = "stop all animation",
