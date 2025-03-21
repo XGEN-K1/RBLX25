@@ -1,3 +1,0 @@
-
-local drownDamage = workspace.ServerData.Configuration:FindFirstChild("DrownDamage")
-drownDamage.Value = 0

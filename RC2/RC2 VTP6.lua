@@ -1,5 +1,5 @@
 if game.PlaceId ~= 12196278347 then
-    warn("Цей скрипт можна використовувати лише в грі з ID 12196278347.")
+    --warn("Цей скрипт можна використовувати лише в грі з ID 12196278347.")
     return
 end
 
@@ -9,28 +9,40 @@ local player = Players.LocalPlayer
 
 -- Задані точки
 local teleportPoints = {
-    {"Sell", Vector3.new(1442, 22, 174)},
+    {"Silver's SellZone", Vector3.new(1442, 22, 174)},
+    {"NF SellZone", Vector3.new(2223, 49, -710)},
     {"Abyss", Vector3.new(-7255, -623, 945)},
-    {"Furniture", Vector3.new(-611, 89, 274)},
-    {"UGS", Vector3.new(1902, 19, -209)},
+    {"UCS", Vector3.new(1902, 19, -209)},
+    {"FurnitureS", Vector3.new(-611, 89, 274)},
+    {"Dealership", Vector3.new(-6904, 13, -4302)},
+    {"Sarcophagus", Vector3.new(-7881, 27, -3239)},
     {"Vi'sLogics", Vector3.new(-5141, 82, -2796)},
     {"Vi'sLab UP", Vector3.new(-4478, 163, -1912)},
     {"Vi'sLab", Vector3.new(-4406, -185, -2028)},
-    {"Dealership", Vector3.new(-6904, 13, -4302)},
-    {"Sarcophagus", Vector3.new(-7881, 27, -3239)},
-    {"NovaBay", Vector3.new(522, 98, -84)},
     {"Wizard", Vector3.new(2023, -423, -282)},
     {"LushShop", Vector3.new(2267, -465, -22)},
     {"NauticFinds", Vector3.new(2197, 19, -742)},
     {"Enchant", Vector3.new(3150, -567, -1586)},
-    {"Zik", Vector3.new(-462, 73, 712)},
-    {"ElfOnAdam", Vector3.new(-7579, 720, -3647)},
+    --{"Zik", Vector3.new(-462, 73, 712)},
+    --{"Mountain Adam Elf", Vector3.new(-7579, 720, -3647)},
+    {"Cloudnite", Vector3.new(-7237, 795, -3258)},
+    {"Scarlet&Coal", Vector3.new(-6195, 73, -2279)},
+    
+    {"Rpsawell Mines", Vector3.new(-5549, 49, -1685)},
+    {"SaltCave", Vector3.new(-6000, -146, -2029)},
+    {"Shack", Vector3.new(-5304, 201, -3441)},
+    {"LumenaHill", Vector3.new(-5633, 390, -2216)},
+    {"Mountain Eve(skill)", Vector3.new(-5638, 398, -3193)},
+    {"SwampIsland", Vector3.new(874, 86, -2990)},
+    {"RIsland1", Vector3.new(4082, 72, -2189)},
+    {"RIsland2", Vector3.new(3803, 80, 677)},
+    {"NovabayFerry", Vector3.new(-356, 21, 1326)},
+    {"RosewellFerry", Vector3.new(-3801, 40, -852)},
+    {"NovaBay", Vector3.new(522, 98, -84)},
     {"BlueRoom", Vector3.new(326, 23, 634)},
-    {"Ship1", Vector3.new(-356, 21, 1326)},
-    {"Ship2", Vector3.new(-3801, 40, -852)},
     {"SecretCola", Vector3.new(10004, -491, 5030)},
-    {"MyBase", Vector3.new(522, 98, -84)},
-    {"Friend1", Vector3.new(522, 98, -84)},
+    --{"MyBase", Vector3.new(522, 98, -84)},
+    --{"Friend1", Vector3.new(522, 98, -84)},
     {"Plot1", Vector3.new(1711, 33, -250)},
     {"Plot2", Vector3.new(1315, 49, 516)},
     {"Plot3", Vector3.new(1564, 42, 607)},
@@ -85,10 +97,11 @@ end
 -- Створення GUI
 local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 screenGui.Name = "TeleportGUI"
+screenGui.ResetOnSpawn = false
 
 local frame = Instance.new("Frame", screenGui)
 frame.Size = UDim2.new(0, 300, 0, 400)
-frame.Position = UDim2.new(0, 10, 0, 600)
+frame.Position = UDim2.new(0, 10, 0, 500)
 
 frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 frame.BackgroundTransparency = 0.9
@@ -99,7 +112,7 @@ frame.Selectable = true
 local titleLabel = Instance.new("TextLabel", frame)
 titleLabel.Size = UDim2.new(1, -20, 0, 30)
 titleLabel.Position = UDim2.new(0, 10, 0, 10)
-titleLabel.Text = "Teleport GUI"
+titleLabel.Text = "              TP"
 titleLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 titleLabel.BackgroundTransparency = 0.5
 titleLabel.TextColor3 = Color3.new(1, 1, 1)

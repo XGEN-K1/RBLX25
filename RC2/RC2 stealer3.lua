@@ -1,3 +1,7 @@
+if game.PlaceId ~= 12196278347 then
+    --warn("Цей скрипт можна використовувати лише в грі з ID 12196278347.")
+    return
+end
 local playerNameToTeleport = "" -- Якщо порожнє, використовуємо локального гравця; або вкажіть інше ім’я
 local otherOwnerToTeleport = "" -- Нік гравця, чиї речі також телепортувати (залиште порожнім, якщо не потрібно)
 local parentFolder = workspace.Grab
